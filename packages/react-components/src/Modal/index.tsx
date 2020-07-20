@@ -6,6 +6,7 @@ import { ActionsProps, ColumnProps, ModalProps } from './types';
 
 import React from 'react';
 import SUIModal from 'semantic-ui-react/dist/commonjs/modules/Modal/Modal';
+import styled from 'styled-components';
 
 import Actions from './Actions';
 import Column from './Column';
@@ -47,4 +48,16 @@ Modal.Content = SUIModal.Content;
 Modal.Header = SUIModal.Header;
 Modal.Description = SUIModal.Description;
 
-export default Modal;
+export default styled(Modal)`
+  max-width: 572px;
+
+  h2 {
+    color: var(--grey80);
+    margin-bottom: 12px;
+  }
+  
+  >.content {
+    color: var(--grey60);
+    padding: 24px;
+  }
+`;

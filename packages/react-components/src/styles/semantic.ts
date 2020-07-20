@@ -192,13 +192,14 @@ export default css`
 
   .ui.modal {
     ${ELEV_3_CSS}
-    box-shadow: none;
+    box-shadow: var(--big-shadow);
     font-family: var(--default-font-family, sans-serif);;
     max-width: 572px;
 
     > .actions,
     > .content {
       background: transparent;
+      font-size: 0.875rem;
     }
 
     > .actions {
@@ -269,7 +270,7 @@ export default css`
 
   /* modals aligned to top, not center */
   .ui.dimmer {
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(21,27,31,0.7);
     justify-content: flex-start;
   }
 

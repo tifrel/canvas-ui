@@ -35,6 +35,9 @@ export default css`
     /* radii*/
     --btn-radius-default: 4px;
 
+    /* shadows */
+    --modal-shadow: 4px, 4px, 8px, rgba(0, 0, 0, .2);
+
     /* typography */
     --default-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
   }
