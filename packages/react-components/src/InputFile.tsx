@@ -163,7 +163,7 @@ function InputFile ({ accept, children, className = '', clearContent, convertHex
 export default React.memo(styled(InputFile)`
   cursor: pointer;
   display: table;
-  font-size: 1rem;
+  font-size: 0.875rem;
   margin: 0.25rem 0;
   padding: 1rem;
 

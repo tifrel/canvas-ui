@@ -103,11 +103,16 @@ export default React.memo(styled(Apps)`
   height: 100vh;
 
   &.theme--default {
+    .apps--SideBar-Item,
+    .apps--SideBar-Item:not(:last-child) {
+      margin-bottom: 0;
+    }
+
     a.apps--SideBar-Item-NavLink {
       border-radius: 0.25rem;
       color: var(--grey70);
       display: block;
-      margin: 0 0 0.24rem;
+      margin: 0 0 0.75rem;
       padding: 0.5rem 0.5rem;
       white-space: nowrap;
 
@@ -116,7 +121,7 @@ export default React.memo(styled(Apps)`
       }
 
       &:hover {
-        background: var(--grey20);
+        background: var(--grey30);
         border-radius: var(--btn-radius-default);
         color: var(--grey80);
       }

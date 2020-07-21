@@ -129,7 +129,7 @@ export default css`
 
     &.ui.modal > .header:not(.ui),
     .ui.modal > .header:not(.ui) {
-      color: var(--grey90);
+      color: var(--grey80);
       font-weight: 300;
     }
 
@@ -155,7 +155,7 @@ export default css`
     }
 
     .ui.input>input {
-      color: var(--grey90);
+      color: var(--grey80);
     }
   }
 `;

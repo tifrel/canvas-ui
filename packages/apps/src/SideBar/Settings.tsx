@@ -74,6 +74,10 @@ export default React.memo(styled(Settings)`
         color: var(--grey80);
       }
 
+      &:focus {
+        border-color: transparent;
+      }
+
       &.active {
         background: transparent;
         border-color: transparent;

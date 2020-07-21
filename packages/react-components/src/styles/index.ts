@@ -106,7 +106,7 @@ export default createGlobalStyle<Props>`
   }
 
   #root {
-    color: var(--grey90);
+    color: var(--grey80);
     font-family: var(--default-font-family, sans-serif);
     font-size: 0.875rem;
     height: 100%;
@@ -232,7 +232,7 @@ export default createGlobalStyle<Props>`
   }
 
   h1, h2, h3, h4, h5 {
-    color: var(--grey90);
+    color: var(--grey80);
     font-family: var(--default-font-family, sans-serif);
     font-weight: 300;
   }
@@ -253,7 +253,7 @@ export default createGlobalStyle<Props>`
   header {
     margin: 2rem 0;
     padding: 0 0 2rem;
-    border-bottom: 1px solid var(--grey20);
+    border-bottom: 1px solid var(--grey30);
 
     > article {
       background: transparent;
@@ -265,12 +265,12 @@ export default createGlobalStyle<Props>`
   }
 
   input {
-    color: var(--grey90);
+    color: var(--grey80);
   }
 
   label {
     box-sizing: border-box;
-    color: var(--grey90);
+    color: var(--grey80);
     display: block;
     font-family: var(--default-font-family, sans-serif);
     font-size: 1rem;

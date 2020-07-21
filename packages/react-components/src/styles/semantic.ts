@@ -51,7 +51,7 @@ export default css`
 
   .ui.input {
     > input, > input:focus {
-      color: var(--grey90);
+      color: var(--grey80);
       ${ELEV_2_CSS}
     }
 
@@ -69,7 +69,7 @@ export default css`
 
   .ui.selection.dropdown {
     ${ELEV_2_CSS}
-    color: var(--grey90);
+    color: var(--grey80);
     border: 1px solid var(--grey20); 
   }
 
@@ -110,7 +110,7 @@ export default css`
   }
 
   .ui.dropdown .menu > .header {
-    color: var(--grey90);
+    color: var(--grey80);
   }
 
   .ui.selection.active.dropdown {
@@ -126,13 +126,13 @@ export default css`
   }
 
   .ui.selection.visible.dropdown>.text:not(.default) {
-    color: var(--grey90);
+    color: var(--grey80);
   }
 
   .ui.selection.dropdown .menu > .item {
     &, &:hover {
       border-top: 0;
-      color: var(--grey90);
+      color: var(--grey80);
     }
 
     &:hover {
@@ -141,7 +141,7 @@ export default css`
   }
 
   .ui.dropdown .menu .selected.item {
-    color: var(--grey90);
+    color: var(--grey80);
   }
 
   // .ui.dropdown .menu > .item.header.disabled:hover,
