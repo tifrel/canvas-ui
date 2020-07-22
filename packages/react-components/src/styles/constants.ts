@@ -16,7 +16,7 @@ export const SECONDARY_LIGHT_HEX = '#F8C34F';
 
 export const ERROR_BG_HEX = '#431818';
 
-export const ERROR_FOCUS_HEX = '#bc0000';
+export const ERROR_FOCUS_HEX = 'var(--red-primary)';
 
 export const ELEV_CSS = `
   box-sizing: border-box;

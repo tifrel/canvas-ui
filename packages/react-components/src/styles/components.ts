@@ -17,7 +17,7 @@ export default css`
 
     &.error {
       background: #fff6f6;
-      border-color: #e0b4b4;
+      border-color: var(--red-primary);
     }
 
     &.monospace {

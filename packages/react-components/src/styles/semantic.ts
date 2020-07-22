@@ -61,8 +61,15 @@ export default css`
 
     &.error {
       > input {
-        background: ${ERROR_BG_HEX};
+        background: var(--grey20);
         border: 1px solid ${ERROR_FOCUS_HEX};
+
+        :focus,
+        ::placeholder,
+        ::-webkit-input-placeholder,
+        :focus::-webkit-input-placeholder {
+          color: var(--grey60) !important;
+        }
       }
     }
   }
@@ -175,7 +182,7 @@ export default css`
 
     &.disabled.error input {
       background-color: #fff6f6;
-      border-color: #e0b4b4;
+      border-color: var(--red-primary);
     }
 
     > input {

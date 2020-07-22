@@ -168,8 +168,8 @@ export default createGlobalStyle<Props>`
 
     &.error {
       background: #fff6f6;
-      border-color: #e0b4b4;
-      color: #9f3a38;
+      border-color: var(--red-primary);
+      color: var(--grey60);
     }
 
     &.padded {

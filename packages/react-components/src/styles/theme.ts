@@ -15,8 +15,8 @@ export default css`
     --blue-primary: #2477B3;
     --blue-secondary: #195580;
     --green-primary: #16DB9A;
-    --red-primary: #bc0000;
-    --red-secondary: #431818;
+    --red-primary: #F54E4E;
+    --red-secondary: #FF8080;
 
     --grey00: #000;
     --grey10: #151B1F;
