@@ -106,7 +106,7 @@ export default createGlobalStyle<Props>`
   }
 
   #root {
-    color: var(--grey80);
+    color: var(--grey60);
     font-family: var(--default-font-family, sans-serif);
     font-size: 0.875rem;
     height: 100%;
