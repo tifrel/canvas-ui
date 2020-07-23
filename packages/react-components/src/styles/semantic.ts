@@ -44,15 +44,11 @@ export default css`
     width: 100%;
   }
 
-  .ui.dropdown,
-  .ui.input {
-    margin: 0.25rem 0;
-  }
-
   .ui.input {
     > input, > input:focus {
       color: var(--grey80);
       ${ELEV_2_CSS}
+      font-family: var(--default-font-family, sans-serif);
     }
 
     > input:focus {
