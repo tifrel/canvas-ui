@@ -299,10 +299,22 @@ const ExportedComponent = withMulti(
       pointer-events: all;
     }
 
-    .ui.search.selection.dropdown {
-      &:not(.disabled) {
-        height: 4.25rem;
+    .ui.selection.dropdown {
+      padding: 0.75rem;
+
+      >input.search {
+        padding: 0.75rem;
       }
+
+      >.dropdown.icon {
+        top: auto;
+      }
+    }
+
+    .ui.search.selection.dropdown {
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
       > .text > .ui--KeyPair {
         .ui--IdentityIcon-Outer {
