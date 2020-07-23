@@ -98,7 +98,6 @@ export default styled(HelpWidget)`
         width: 100%;
         padding: 8px 12px;
         color: var(--grey80);
-        transition: background 120ms ease-in 0s;
         &:hover {
           background: var(--grey40);
           color: var(--grey80);
