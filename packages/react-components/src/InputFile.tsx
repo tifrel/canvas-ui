@@ -192,6 +192,11 @@ export default React.memo(styled(InputFile)`
     cursor: pointer;
   }
 
+  &:focus {
+    outline: 0;
+    border: 2px solid var(--blue-primary);
+  }
+
   .children {
     margin-top: 1.5rem;
   }
