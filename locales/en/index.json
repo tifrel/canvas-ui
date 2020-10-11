@@ -1,9 +1,12 @@
 [
   "app-accounts.json",
   "app-claims.json",
+  "app-contracts-old.json",
   "app-contracts.json",
   "app-council.json",
   "app-democracy.json",
+  "app-deploy.json",
+  "app-execute.json",
   "app-explorer.json",
   "app-extrinsics.json",
   "app-generic-asset.json",
@@ -17,11 +20,13 @@
   "app-tech-comm.json",
   "app-toolbox.json",
   "app-treasury.json",
+  "app-upload.json",
   "apps-config.json",
   "apps-routing.json",
   "apps.json",
   "react-components.json",
   "react-params.json",
   "react-query.json",
-  "react-signer.json"
+  "react-signer.json",
+  "react-util.json"
 ]
