@@ -5,7 +5,7 @@ import { TypeDef } from '@polkadot/types/types';
 import { ParamDef, Props, RawParam } from '../types';
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { registry } from '@canvas-ui/react-api';
+import { registry as apiRegistry } from '@canvas-ui/react-api';
 import { Dropdown } from '@canvas-ui/react-components';
 import { Enum, createType, getTypeDef } from '@polkadot/types';
 
@@ -24,15 +24,17 @@ interface Options {
 }
 
 function EnumParam (props: Props): React.ReactElement<Props> {
-  const { className = '', defaultValue, isDisabled, isError, label, onChange, overrides, type, withLabel } = props;
+  const { className = '', defaultValue, isDisabled, isError, label, onChange, overrides, registry = apiRegistry, type, withLabel } = props;
   const [current, setCurrent] = useState<ParamDef[] | null>(null);
   const [initialValue, setInitialValue] = useState<string | null>(null);
   const [{ options, subTypes }, setOptions] = useState<Options>({ options: [], subTypes: [] });
 
   useEffect((): void => {
-    const rawType = createType(registry, type.type as 'u32').toRawType();
-    const typeDef = getTypeDef(rawType);
-    const subTypes = typeDef.sub as TypeDef[];
+    // const createdType = createType(registry, type.type as 'u32');
+    // const rawType  = createdType.toRawType();
+    // const typeDef = getTypeDef(rawType);
+
+    const subTypes = type.sub as TypeDef[];
 
     setOptions({
       options: subTypes.map(({ name }): Option => ({
@@ -99,6 +101,7 @@ function EnumParam (props: Props): React.ReactElement<Props> {
           onChange={_onChangeParam}
           overrides={overrides}
           params={current}
+          registry={registry}
         />
       )}
     </Bare>

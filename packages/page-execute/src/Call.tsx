@@ -248,6 +248,7 @@ function Call ({ className, navigateTo }: Props): React.ReactElement<Props> | nu
             <ContractParams
               onChange={setValues}
               params={params}
+              registry={contract?.registry}
               values={values}
             />
             <InputBalance

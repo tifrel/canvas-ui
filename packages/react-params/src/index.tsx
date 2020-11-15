@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { I18nProps } from '@canvas-ui/react-components/types';
+import { Registry } from '@polkadot/types/types';
 import { ComponentMap, ParamDef, RawParam, RawParams, RawParamOnChangeValue } from './types';
 
 import React from 'react';
@@ -21,6 +22,7 @@ interface Props extends I18nProps {
   onEscape?: () => void;
   overrides?: ComponentMap;
   params: ParamDef[];
+  registry?: Registry;
   values?: RawParams | null;
   withBorder?: boolean;
 }
@@ -77,7 +79,7 @@ class Params extends React.PureComponent<Props, State> {
   }
 
   public render (): React.ReactNode {
-    const { children, className = '', isDisabled, onEnter, onEscape, overrides, params, withBorder = true } = this.props;
+    const { children, className = '', isDisabled, onEnter, onEscape, overrides, params, registry, withBorder = true } = this.props;
     const { values = this.props.values } = this.state;
 
     if (!values || !values.length) {
@@ -102,6 +104,7 @@ class Params extends React.PureComponent<Props, State> {
                 onEnter={onEnter}
                 onEscape={onEscape}
                 overrides={overrides}
+                registry={registry}
                 type={type}
               />
             ))}

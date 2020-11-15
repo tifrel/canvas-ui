@@ -11,7 +11,7 @@ import { isUndefined } from '@polkadot/util';
 import findComponent from './findComponent';
 import Static from './Static';
 
-function Param ({ className = '', defaultValue, isDisabled, isInOption, isOptional, name, onChange, onEnter, onEscape, overrides, type }: Props): React.ReactElement<Props> | null {
+function Param ({ className = '', defaultValue, isDisabled, isInOption, isOptional, name, onChange, onEnter, onEscape, overrides, registry, type }: Props): React.ReactElement<Props> | null {
   const compRef = useRef<React.ComponentType<CProps> | null>(findComponent(type, overrides));
 
   const label = useMemo(
@@ -46,6 +46,7 @@ function Param ({ className = '', defaultValue, isDisabled, isInOption, isOption
         onEnter={onEnter}
         onEscape={onEscape}
         overrides={overrides}
+        registry={registry}
         type={type}
       />
     );

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AbiParam } from '@polkadot/api-contract/types';
+import { Registry } from '@polkadot/types/types';
 import { RawParams } from '@canvas-ui/react-params/types';
 
 import React, { useCallback, useEffect, useState } from 'react';
@@ -12,9 +13,10 @@ interface Props {
   params?: AbiParam[];
   onChange: (values: any[]) => void;
   onEnter?: () => void;
+  registry?: Registry
 }
 
-function CallParams ({ isDisabled, onChange, onEnter, params: propParams }: Props): React.ReactElement<Props> | null {
+function CallParams ({ isDisabled, onChange, onEnter, params: propParams, registry }: Props): React.ReactElement<Props> | null {
   const [params, setParams] = useState<AbiParam[]>([]);
 
   useEffect((): void => {
@@ -36,6 +38,7 @@ function CallParams ({ isDisabled, onChange, onEnter, params: propParams }: Prop
       onChange={_onChange}
       onEnter={onEnter}
       params={params}
+      registry={registry}
     />
   );
 }

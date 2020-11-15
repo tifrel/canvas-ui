@@ -9,7 +9,7 @@ const options = {
   repo: `https://${process.env.GH_PAT}@github.com/${process.env.GITHUB_REPOSITORY}.git`
 };
 
-console.log(options);
+// console.log(options);
 
 ghpages.publish('packages/apps/build', options, (error) => {
   if (error) {

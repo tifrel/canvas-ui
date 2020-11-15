@@ -218,6 +218,7 @@ function New ({ allCodes, className, navigateTo }: Props): React.ReactElement<Pr
             <ContractParams
               onChange={setValues}
               params={params || []}
+              registry={abi?.registry}
               values={values}
             />
           </>
