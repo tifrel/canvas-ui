@@ -1,6 +1,6 @@
 {
   "name": "@canvas-ui/react-util",
-  "version": "0.45.0-beta.33",
+  "version": "0.0.1",
   "main": "index.js",
   "repository": "https://github.com/paritytech/canvas-ui",
   "author": "Keith Ingram <keith@parity.io>",
@@ -11,9 +11,9 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@babel/runtime": "^7.10.2",
-    "@canvas-ui/react-api": "0.45.0-beta.33",
+    "@canvas-ui/react-api": "0.0.1",
     "@polkadot/keyring": "^3.5.0-beta.13",
-    "@polkadot/ui-keyring": "^0.59.0-beta.12",
+    "@polkadot/ui-keyring": "^0.65.2-2",
     "i18next": "^19.4.5"
   }
 }

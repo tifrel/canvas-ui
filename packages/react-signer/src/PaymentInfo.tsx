@@ -1,12 +1,13 @@
-// Copyright 2017-2020 @canvas-ui/react-signer authors & contributors
+// Copyright 2017-2021 @canvas-ui/react-signer authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
-import { RuntimeDispatchInfo } from '@polkadot/types/interfaces';
+import type { SubmittableExtrinsic } from '@polkadot/api/promise/types';
+import type { RuntimeDispatchInfo } from '@polkadot/types/interfaces';
 
 import BN from 'bn.js';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Trans } from 'react-i18next';
+
 import { Expander } from '@canvas-ui/react-components';
 import { useApi, useIsMountedRef } from '@canvas-ui/react-hooks';
 import { formatBalance, isFunction } from '@polkadot/util';
@@ -28,13 +29,16 @@ function PaymentInfo ({ accountId, className = '', extrinsic }: Props): React.Re
   useEffect((): void => {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     accountId && extrinsic && isFunction(extrinsic.paymentInfo) && isFunction(api.rpc.payment?.queryInfo) &&
-      Promise.resolve(
-        extrinsic
-          .paymentInfo(accountId)
-          .then((info): void => {
-            mountedRef.current && setDispatchInfo(info);
-          })
-      ).catch((error: Error) => console.error(error.message));
+      setTimeout((): void => {
+        try {
+          extrinsic
+            .paymentInfo(accountId)
+            .then((info) => mountedRef.current && setDispatchInfo(info))
+            .catch(console.error);
+        } catch (error) {
+          console.error((error as Error).message);
+        }
+      }, 0);
   }, [api, accountId, extrinsic, mountedRef]);
 
   if (!dispatchInfo) {
@@ -49,7 +53,6 @@ function PaymentInfo ({ accountId, className = '', extrinsic }: Props): React.Re
           Fees of <span className='highlight'>{formatBalance(dispatchInfo.partialFee, { withSiFull: true })}</span> will be applied to the submission
         </Trans>
       }
-      withDot
     />
   );
 }

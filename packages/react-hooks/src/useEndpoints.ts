@@ -1,10 +1,10 @@
-// Copyright 2017-2020 @canvas-ui/app-settings authors & contributors
+// Copyright 2017-2021 @canvas-ui/app-settings authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import { Endpoint, EndpointUrl, UseEndpoints } from './types';
 
 import { useCallback, useEffect, useState } from 'react';
-import { createEndpoints } from '@canvas-ui/apps-config/settings';
+import { createWsEndpoints } from '@canvas-ui/apps-config/endpoints';
 import uiSettings from '@polkadot/ui-settings';
 
 import { useTranslation } from './translate';
@@ -33,7 +33,7 @@ function getInitialState (t: <T = string> (key: string) => T): Endpoint {
   const url = uiSettings.get().apiUrl;
 
   return {
-    isCustom: createEndpoints(t).reduce((isCustom: boolean, { value }): boolean => {
+    isCustom: createWsEndpoints(t).reduce((isCustom: boolean, { value }): boolean => {
       return isCustom && value !== url;
     }, true),
     isValid: isValidUrl(url),
@@ -61,7 +61,7 @@ export default function useEndpoints (onChange?: (_: string) => void): UseEndpoi
       ...makeUrl(
         isCustom
           ? info.url
-          : (createEndpoints(t).find(({ value }) => value === info.url) || { value: 'ws://127.0.0.1:9944' }).value as string
+          : (createWsEndpoints(t).find(({ value }) => value === info.url) || { value: 'ws://127.0.0.1:9944' }).value as string
       ),
       isCustom
     }),

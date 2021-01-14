@@ -1,15 +1,20 @@
-// Copyright 2017-2020 @canvas-ui/apps-config authors & contributors
+// Copyright 2017-2021 @canvas-ui/apps-config authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import typesChain from './chain';
 import typesSpec from './spec';
+import specVersioned from './specVersioned';
 
-export function getChainTypes (): Record<string, string | Record<string, unknown>> {
+export * from './constants';
+export * from './params';
+
+export function getChainTypes (specName: string, chainName: string): Record<string, string | Record<string, unknown>> {
   return {
+    ...(typesSpec[specName as keyof typeof typesSpec] || {}),
+    ...(typesChain[chainName as keyof typeof typesChain] || {})
   };
 }
 
-export {
-  typesChain,
-  typesSpec
-};
+export const typesBundle = { spec: specVersioned };
+
+export { typesChain, typesSpec };

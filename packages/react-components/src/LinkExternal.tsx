@@ -1,33 +1,34 @@
-// Copyright 2017-2020 @canvas-ui/react-components authors & contributors
+// Copyright 2017-2021 @polkadot/react-components authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { LinkTypes } from '@canvas-ui/apps-config/links/types';
+import type { LinkTypes } from '@canvas-ui/apps-config/links/types';
 
 import BN from 'bn.js';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
-import linked from '@canvas-ui/apps-config/links';
+
+import { externalLinks } from '@canvas-ui/apps-config';
 import { useApi } from '@canvas-ui/react-hooks';
 
 import { useTranslation } from './translate';
-import Tooltip from './Tooltip';
 
 interface Props {
   className?: string;
   data: BN | number | string;
   hash?: string;
+  isLogo?: boolean;
+  isSmall?: boolean;
   type: LinkTypes;
-  withShort?: boolean;
 }
 
-function shortName (name: string): string {
-  return `${name[0]}${name[name.length - 1]}`;
-}
+// function shortName (name: string): string {
+//   return `${name[0]}${name[name.length - 1]}`;
+// }
 
-function genLinks (systemChain: string, { data, hash, type, withShort }: Props): React.ReactNode[] {
+function genLinks (systemChain: string, { data, hash, isLogo, type }: Props): React.ReactNode[] {
   return Object
-    .entries(linked)
-    .map(([name, { chains, create, isActive, paths, url }]): React.ReactNode | null => {
+    .entries(externalLinks)
+    .map(([name, { chains, create, isActive, logo, paths, url }]): React.ReactNode | null => {
       const extChain = chains[systemChain];
       const extPath = paths[type];
 
@@ -35,39 +36,30 @@ function genLinks (systemChain: string, { data, hash, type, withShort }: Props):
         return null;
       }
 
-      const trigger = `${name}-${type}-${data.toString()}`;
-      const link = create(extChain, extPath, data, hash);
-
       return (
         <a
-          data-for={trigger}
-          data-tip={true}
-          href={link}
+          href={create(extChain, extPath, data, hash)}
           key={name}
           rel='noopener noreferrer'
           target='_blank'
+          title={`${name}, ${url}`}
         >
-          {withShort
-            ? shortName(name)
+          {isLogo
+            ? <img src={logo} />
             : name
           }
-          <Tooltip
-            place='top'
-            text={<>{name}<br />{url}</>}
-            trigger={trigger}
-          />
         </a>
       );
     })
     .filter((node): node is React.ReactNode => !!node);
 }
 
-function LinkExternal ({ className = '', data, hash, type, withShort }: Props): React.ReactElement<Props> | null {
+function LinkExternal ({ className = '', data, hash, isLogo, isSmall, type }: Props): React.ReactElement<Props> | null {
   const { t } = useTranslation();
   const { systemChain } = useApi();
   const links = useMemo(
-    () => genLinks(systemChain, { data, hash, type, withShort }),
-    [systemChain, data, hash, type, withShort]
+    () => genLinks(systemChain, { data, hash, isLogo, type }),
+    [systemChain, data, hash, isLogo, type]
   );
 
   if (!links.length) {
@@ -75,8 +67,8 @@ function LinkExternal ({ className = '', data, hash, type, withShort }: Props): 
   }
 
   return (
-    <div className={`${className} ${withShort ? 'withShort' : ''}`}>
-      {!withShort && <div>{t<string>('View this externally')}</div>}
+    <div className={`${className}${isLogo ? ' isLogo' : ''}${isSmall ? ' isSmall' : ''}`}>
+      {!(isLogo || isSmall) && <div>{t<string>('View this externally')}</div>}
       <div className='links'>{links.map((link, index) => <span key={index}>{link}</span>)}</div>
     </div>
   );
@@ -85,7 +77,33 @@ function LinkExternal ({ className = '', data, hash, type, withShort }: Props): 
 export default React.memo(styled(LinkExternal)`
   text-align: right;
 
+  &.isSmall {
+    font-size: 0.85rem;
+    line-height: 1.35;
+    text-align: center;
+  }
+
+  &.isLogo {
+    line-height: 1;
+
+    .links {
+      white-space: nowrap;
+    }
+  }
+
   .links {
+    img {
+      border-radius: 50%;
+      cursor: pointer;
+      filter: grayscale(1) opacity(0.66);
+      height: 1.5rem;
+      width: 1.5rem;
+
+      &:hover {
+        filter: grayscale(0) opacity(1);
+      }
+    }
+
     span {
       word-wrap: normal;
       display: inline-block;

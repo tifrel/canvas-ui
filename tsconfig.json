@@ -10,6 +10,7 @@
     "paths": {
       "@canvas-ui/apps/*": ["packages/apps/src/*"],
       "@canvas-ui/apps": ["packages/apps/src"],
+      "@canvas-ui/apps-config": [ "packages/apps-config/src" ],
       "@canvas-ui/apps-config/*": [ "packages/apps-config/src/*" ],
       "@canvas-ui/apps-routing": [ "packages/apps-routing/src" ],
       "@canvas-ui/apps-routing/*": [ "packages/apps-routing/src/*" ],

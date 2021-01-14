@@ -1,4 +1,4 @@
-// Copyright 2017-2020 @canvas-ui/react-components authors & contributors
+// Copyright 2017-2021 @canvas-ui/react-components authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import { WithTranslation } from 'react-i18next';
@@ -114,4 +114,34 @@ export type CallContract = ContractDeployed;
 export interface NullContract {
   abi: null;
   address: null;
+}
+
+export interface ThemeDef {
+  bgInput: string;
+  bgInputError: string;
+  bgInverse: string;
+  bgMenu: string;
+  bgMenuHover: string;
+  bgPage: string;
+  bgTable: string;
+  bgTabs: string;
+  bgToggle: string;
+  borderTable: string;
+  borderTabs: string;
+  color: string;
+  colorCheckbox: string;
+  colorError: string;
+  colorLabel: string;
+  colorSummary: string;
+  contentHalfWidth: string;
+  contentMaxWidth: string;
+  fontSans: string;
+  fontMono: string;
+  fontWeightLight: number;
+  fontWeightNormal: number;
+  theme: 'dark' | 'light';
+}
+
+export interface ThemeProps {
+  theme: ThemeDef;
 }

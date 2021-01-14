@@ -1,9 +1,9 @@
-// Copyright 2017-2020 @canvas-ui/apps authors & contributors
+// Copyright 2017-2021 @canvas-ui/apps authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import queryString from 'query-string';
 import store from 'store';
-import { createEndpoints } from '@canvas-ui/apps-config/settings';
+import { createWsEndpoints } from '@canvas-ui/apps-config/endpoints';
 import { registry } from '@canvas-ui/react-api';
 import { extractIpfsDetails } from '@canvas-ui/react-hooks/useIpfs';
 import settings from '@polkadot/ui-settings';
@@ -23,7 +23,7 @@ function getApiUrl (): string {
     return urlOptions.rpc.split('#')[0]; // https://polkadot.js.org/apps/?rpc=ws://127.0.0.1:9944#/explorer;
   }
 
-  const endpoints = createEndpoints(<T = string>(): T => ('' as unknown as T));
+  const endpoints = createWsEndpoints(<T = string>(): T => ('' as unknown as T));
   const { ipnsChain } = extractIpfsDetails();
 
   // check against ipns domains (could be expanded to others)

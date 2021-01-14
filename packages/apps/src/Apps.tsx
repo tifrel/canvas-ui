@@ -1,4 +1,4 @@
-// Copyright 2017-2020 @canvas-ui/apps authors & contributors
+// Copyright 2017-2021 @canvas-ui/apps authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import { BareProps as Props } from '@canvas-ui/react-components/types';
@@ -7,7 +7,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import store from 'store';
 import styled from 'styled-components';
 import { getSystemChainColor } from '@canvas-ui/apps-config/ui';
-import { defaultColor } from '@canvas-ui/apps-config/ui/general';
+import { defaultColor } from '@canvas-ui/apps-config/ui/colors';
 import GlobalStyle from '@canvas-ui/react-components/styles';
 import { useApi } from '@canvas-ui/react-hooks';
 

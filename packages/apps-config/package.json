@@ -1,17 +1,25 @@
 {
   "name": "@canvas-ui/apps-config",
-  "private": true,
-  "version": "0.45.0-beta.33",
+  "version": "0.0.1",
   "main": "index.js",
-  "repository": "https://github.com/paritytech/canvas-ui",
+  "sideEffects": true,
+  "repository": "github:paritytech/canvas-ui",
   "author": "Jaco Greeff <jacogr@gmail.com>",
-  "maintainers": [
-    "Jaco Greeff <jacogr@gmail.com>"
-  ],
+  "maintainers": [],
   "contributors": [],
   "license": "Apache-2.0",
   "dependencies": {
-    "@babel/runtime": "^7.10.2",
-    "edgeware-node-types": "^2.3.3"
+    "@acala-network/type-definitions": "^0.6.1",
+    "@babel/runtime": "^7.12.5",
+    "@edgeware/node-types": "^3.2.0",
+    "@interlay/polkabtc-types": "^0.2.9",
+    "@laminar/type-definitions": "^0.2.0-beta.143",
+    "@polkadot/networks": "^5.2.3",
+    "@sora-substrate/type-definitions": "^0.3.3",
+    "@subsocial/types": "^0.4.28",
+    "moonbeam-types-bundle": "^1.0.5"
+  },
+  "devDependencies": {
+    "i18next": "^19.8.4"
   }
 }

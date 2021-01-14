@@ -1,29 +1,31 @@
-// Copyright 2017-2020 @canvas-ui/react-api authors & contributors
+// Copyright 2017-2021 @canvas-ui/react-api authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { InjectedExtension } from '@polkadot/extension-inject/types';
-import { ChainProperties, ChainType } from '@polkadot/types/interfaces';
-import { ApiProps, ApiState } from './types';
+import type { InjectedExtension } from '@polkadot/extension-inject/types';
+import type { ChainProperties, ChainType } from '@polkadot/types/interfaces';
+import type { KeyringStore } from '@polkadot/ui-keyring/types';
+import type { ApiProps, ApiState } from './types';
 
 import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { ApiPromise } from '@polkadot/api/promise';
-import { setDeriveCache, deriveMapCache } from '@polkadot/api-derive/util';
-import { typesChain, typesSpec } from '@canvas-ui/apps-config/api';
-import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
-import { WsProvider } from '@polkadot/rpc-provider';
-import { StatusContext } from '@canvas-ui/react-components/Status';
-import { TokenUnit } from '@canvas-ui/react-components/InputNumber';
-import keyring from '@polkadot/ui-keyring';
-import { KeyringStore } from '@polkadot/ui-keyring/types';
+import store from 'store';
 
-import uiSettings from '@polkadot/ui-settings';
-import ApiSigner from '@canvas-ui/react-signer/ApiSigner';
+import { ApiPromise } from '@polkadot/api/promise';
+import { deriveMapCache, setDeriveCache } from '@polkadot/api-derive/util';
+import { ethereumChains, POLKADOT_GENESIS, typesBundle, typesChain, typesSpec } from '@canvas-ui/apps-config';
+import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
+import { TokenUnit } from '@canvas-ui/react-components/InputNumber';
+import { StatusContext } from '@canvas-ui/react-components/Status';
+import ApiSigner from '@canvas-ui/react-signer/signers/ApiSigner';
+import { WsProvider } from '@polkadot/rpc-provider';
+import { keyring } from '@polkadot/ui-keyring';
+import { settings } from '@polkadot/ui-settings';
 import { formatBalance, isTestChain } from '@polkadot/util';
 import { setSS58Format } from '@polkadot/util-crypto';
-import addressDefaults from '@polkadot/util-crypto/address/defaults';
+import { defaults as addressDefaults } from '@polkadot/util-crypto/address/defaults';
 
 import ApiContext from './ApiContext';
 import registry from './typeRegistry';
+import { decodeUrlTypes } from './urlTypes';
 
 interface Props {
   children: React.ReactNode;
@@ -49,21 +51,53 @@ interface ChainData {
   systemVersion: string;
 }
 
-// const injectedPromise = new Promise<InjectedExtension[]>((resolve): void => {
-//   window.addEventListener('load', (): void => {
-//     resolve(web3Enable('polkadot-js/apps'));
-//   });
-// });
+export const DEFAULT_DECIMALS = registry.createType('u32', 15);
+export const DEFAULT_SS58 = registry.createType('u32', addressDefaults.prefix);
 
-const DEFAULT_DECIMALS = registry.createType('u32', 12);
-const DEFAULT_SS58 = registry.createType('u32', addressDefaults.prefix);
-const injectedPromise = web3Enable('polkadot-js/apps');
 let api: ApiPromise;
 
 export { api };
 
-async function retrieve (api: ApiPromise): Promise<ChainData> {
-  const [properties, systemChain, systemChainType, systemName, systemVersion, injectedAccounts] = await Promise.all([
+function isKeyringLoaded () {
+  try {
+    return !!keyring.keyring;
+  } catch {
+    return false;
+  }
+}
+
+function getDevTypes (): Record<string, Record<string, string>> {
+  const types = decodeUrlTypes() || store.get('types', {}) as Record<string, Record<string, string>>;
+  const names = Object.keys(types);
+
+  names.length && console.log('Injected types:', names.join(', '));
+
+  return types;
+}
+
+async function getInjectedAccounts (injectedPromise: Promise<InjectedExtension[]>): Promise<InjectedAccountExt[]> {
+  try {
+    await injectedPromise;
+
+    const accounts = await web3Accounts();
+
+    return accounts.map(({ address, meta }, whenCreated): InjectedAccountExt => ({
+      address,
+      meta: {
+        ...meta,
+        name: `${meta.name || 'unknown'} (${meta.source === 'polkadot-js' ? 'extension' : meta.source})`,
+        whenCreated
+      }
+    }));
+  } catch (error) {
+    console.error('web3Enable', error);
+
+    return [];
+  }
+}
+
+async function retrieve (api: ApiPromise, injectedPromise: Promise<InjectedExtension[]>): Promise<ChainData> {
+  const [chainProperties, systemChain, systemChainType, systemName, systemVersion, injectedAccounts] = await Promise.all([
     api.rpc.system.properties(),
     api.rpc.system.chain(),
     api.rpc.system.chainType
@@ -71,22 +105,16 @@ async function retrieve (api: ApiPromise): Promise<ChainData> {
       : Promise.resolve(registry.createType('ChainType', 'Live')),
     api.rpc.system.name(),
     api.rpc.system.version(),
-    injectedPromise
-      .then(() => web3Accounts())
-      .then((accounts) => accounts.map(({ address, meta }, whenCreated): InjectedAccountExt => ({
-        address,
-        meta: {
-          ...meta,
-          name: `${meta.name || 'unknown'} (${meta.source === 'polkadot-js' ? 'extension' : meta.source})`,
-          whenCreated
-        }
-      })))
-      .catch((error): InjectedAccountExt[] => {
-        console.error('web3Enable', error);
-
-        return [];
-      })
+    getInjectedAccounts(injectedPromise)
   ]);
+
+  // HACK Horrible hack to try and give some window to the DOT denomination
+  const ss58Format = api.consts.system?.ss58Prefix || chainProperties.ss58Format;
+  const properties = registry.createType('ChainProperties',
+    api.genesisHash.eq(POLKADOT_GENESIS)
+      ? { ...chainProperties, ss58Format, tokenDecimals: 10, tokenSymbol: 'DOT' }
+      : { ...chainProperties, ss58Format }
+  );
 
   return {
     injectedAccounts,
@@ -98,19 +126,21 @@ async function retrieve (api: ApiPromise): Promise<ChainData> {
   };
 }
 
-async function loadOnReady (api: ApiPromise, store?: KeyringStore): Promise<ApiState> {
-  const { injectedAccounts, properties, systemChain, systemChainType, systemName, systemVersion } = await retrieve(api);
-  const ss58Format = uiSettings.prefix === -1
+async function loadOnReady (api: ApiPromise, injectedPromise: Promise<InjectedExtension[]>, store: KeyringStore | undefined, types: Record<string, Record<string, string>>): Promise<ApiState> {
+  registry.register(types);
+  const { injectedAccounts, properties, systemChain, systemChainType, systemName, systemVersion } = await retrieve(api, injectedPromise);
+  const ss58Format = settings.prefix === -1
     ? properties.ss58Format.unwrapOr(DEFAULT_SS58).toNumber()
-    : uiSettings.prefix;
+    : settings.prefix;
   const tokenSymbol = properties.tokenSymbol.unwrapOr(undefined)?.toString();
   const tokenDecimals = properties.tokenDecimals.unwrapOr(DEFAULT_DECIMALS).toNumber();
-  const isDevelopment = systemChainType.isDevelopment || systemChainType.isLocal || isTestChain(systemChain);
+  const isEthereum = ethereumChains.includes(api.runtimeVersion.specName.toString());
+  const isDevelopment = !isEthereum && (systemChainType.isDevelopment || systemChainType.isLocal || isTestChain(systemChain));
 
   console.log(`chain: ${systemChain} (${systemChainType.toString()}), ${JSON.stringify(properties)}`);
 
   // explicitly override the ss58Format as specified
-  registry.setChainProperties(registry.createType('ChainProperties', { ...properties, ss58Format }));
+  registry.setChainProperties(registry.createType('ChainProperties', { ss58Format, tokenDecimals, tokenSymbol }));
 
   // FIXME This should be removed (however we have some hanging bits, e.g. vanity)
   setSS58Format(ss58Format);
@@ -123,12 +153,12 @@ async function loadOnReady (api: ApiPromise, store?: KeyringStore): Promise<ApiS
   TokenUnit.setAbbr(tokenSymbol);
 
   // finally load the keyring
-  keyring.loadAll({
+  isKeyringLoaded() || keyring.loadAll({
     genesisHash: api.genesisHash,
     isDevelopment,
     ss58Format,
     store,
-    type: 'ed25519'
+    type: isEthereum ? 'ethereum' : 'ed25519'
   }, injectedAccounts);
 
   const defaultSection = Object.keys(api.tx)[0];
@@ -144,7 +174,8 @@ async function loadOnReady (api: ApiPromise, store?: KeyringStore): Promise<ApiS
     apiDefaultTxSudo,
     hasInjectedAccounts: injectedAccounts.length !== 0,
     isApiReady: true,
-    isDevelopment,
+    isDevelopment: isEthereum ? false : isDevelopment,
+    isEthereum,
     isSubstrateV2,
     systemChain,
     systemName,
@@ -154,46 +185,54 @@ async function loadOnReady (api: ApiPromise, store?: KeyringStore): Promise<ApiS
 
 function Api ({ children, store, url }: Props): React.ReactElement<Props> | null {
   const { queuePayload, queueSetTxStatus } = useContext(StatusContext);
-  const [state, setState] = useState<ApiState>({ isApiReady: false } as unknown as ApiState);
+  const [state, setState] = useState<ApiState>({ hasInjectedAccounts: false, isApiReady: false } as unknown as ApiState);
   const [isApiConnected, setIsApiConnected] = useState(false);
   const [isApiInitialized, setIsApiInitialized] = useState(false);
+  const [apiError, setApiError] = useState<null | string>(null);
   const [extensions, setExtensions] = useState<InjectedExtension[] | undefined>();
-  const props = useMemo<ApiProps>(
-    () => ({ ...state, api, extensions, isApiConnected, isApiInitialized, isWaitingInjected: !extensions }),
-    [extensions, isApiConnected, isApiInitialized, state]
+
+  const value = useMemo<ApiProps>(
+    () => ({ ...state, api, apiError, extensions, isApiConnected, isApiInitialized, isWaitingInjected: !extensions }),
+    [apiError, extensions, isApiConnected, isApiInitialized, state]
   );
 
   // initial initialization
   useEffect((): void => {
     const provider = new WsProvider(url);
-    const signer = new ApiSigner(queuePayload, queueSetTxStatus);
+    const signer = new ApiSigner(registry, queuePayload, queueSetTxStatus);
+    const types = getDevTypes();
 
-    api = new ApiPromise({ provider, registry, signer, typesChain, typesSpec });
+    api = new ApiPromise({ provider, registry, signer, types, typesBundle, typesChain, typesSpec });
 
     api.on('connected', () => setIsApiConnected(true));
     api.on('disconnected', () => setIsApiConnected(false));
-    api.on('ready', async (): Promise<void> => {
-      try {
-        setState(await loadOnReady(api, store));
-      } catch (error) {
-        console.error('Unable to load chain', error);
-      }
-    });
+    api.on('error', (error: Error) => setApiError(error.message));
+    api.on('ready', (): void => {
+      const injectedPromise = web3Enable('polkadot-js/apps');
 
-    injectedPromise
-      .then(setExtensions)
-      .catch((error) => console.error(error));
+      injectedPromise
+        .then(setExtensions)
+        .catch(console.error);
+
+      loadOnReady(api, injectedPromise, store, types)
+        .then(setState)
+        .catch((error): void => {
+          console.error(error);
+
+          setApiError((error as Error).message);
+        });
+    });
 
     setIsApiInitialized(true);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!props.isApiInitialized) {
+  if (!value.isApiInitialized) {
     return null;
   }
 
   return (
-    <ApiContext.Provider value={props}>
+    <ApiContext.Provider value={value}>
       {children}
     </ApiContext.Provider>
   );

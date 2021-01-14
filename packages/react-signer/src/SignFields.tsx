@@ -1,12 +1,13 @@
-// Copyright 2017-2020 @canvas-ui/react-signer authors & contributors
+// Copyright 2017-2021 @canvas-ui/react-signer authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { SignerOptions } from '@polkadot/api/submittable/types';
+import type { SignerOptions } from '@polkadot/api/submittable/types';
 
 import BN from 'bn.js';
 import React, { useCallback, useEffect, useState } from 'react';
-import { InputNumber, Modal, Output } from '@canvas-ui/react-components';
-import { useApi } from '@canvas-ui/react-hooks';
+
+import { InputNumber, Modal, Output } from '@polkadot/react-components';
+import { useApi } from '@polkadot/react-hooks';
 import { BN_ZERO } from '@polkadot/util';
 
 import { useTranslation } from './translate';
@@ -32,7 +33,6 @@ function SignFields ({ address, onChange, signedTx }: Props): React.ReactElement
   }, [address, api]);
 
   useEffect((): void => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     onChange({ era: blocks.toNumber(), nonce });
   }, [blocks, nonce, onChange]);
 
@@ -68,7 +68,7 @@ function SignFields ({ address, onChange, signedTx }: Props): React.ReactElement
           />
         </Modal.Column>
         <Modal.Column>
-          <p>{t<string>('Override any applicable values for the specific signed output. These will be used to construct and display the signed transaction.')}</p>
+          <p>{t('Override any applicable values for the specific signed output. These will be used to construct and display the signed transaction.')}</p>
         </Modal.Column>
       </Modal.Columns>
       {!!signedTx && (
@@ -83,7 +83,7 @@ function SignFields ({ address, onChange, signedTx }: Props): React.ReactElement
             />
           </Modal.Column>
           <Modal.Column>
-            {t<string>('The actual fully constructed signed output. This can be used for submission via other channels.')}
+            {t('The actual fully constructed signed output. This can be used for submission via other channels.')}
           </Modal.Column>
         </Modal.Columns>
       )}
