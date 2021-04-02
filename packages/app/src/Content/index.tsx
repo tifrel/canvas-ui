@@ -6,7 +6,7 @@ import createRoutes from '@canvas-ui/app-routing';
 import { Route } from '@canvas-ui/app-routing/types';
 import { ErrorBoundary, GuideModal, Icon, StatusContext, WithLoader } from '@canvas-ui/react-components';
 import { ELEV_3_CSS } from '@canvas-ui/react-components/styles/constants';
-import { useApi } from '@canvas-ui/react-hooks';
+import { useApi, useDatabase } from '@canvas-ui/react-hooks';
 import { classes } from '@canvas-ui/react-util';
 import React, { Suspense, useCallback, useContext, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -38,6 +38,7 @@ function Content ({ className }: Props): React.ReactElement<Props> {
   const location = useLocation();
   const { t } = useTranslation();
   const { isApiConnected, isApiReady } = useApi();
+  const { db, isDbReady } = useDatabase();
   const { queueAction, stqueue, txqueue } = useContext(StatusContext);
   const { Component, display: { needsApi }, name } = useMemo(
     (): Route => {
@@ -69,9 +70,11 @@ function Content ({ className }: Props): React.ReactElement<Props> {
     );
   }
 
-  const isLoading = needsApi && !isApiReady;
+  const isLoading = needsApi && !isApiReady && !isDbReady;
 
   const sawGuide = !!store.get(sawGuideKey) || false;
+
+  console.log(db);
 
   return (
     <div className={classes(className, isLoading && 'isLoading')}>

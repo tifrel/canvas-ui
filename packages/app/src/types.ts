@@ -2,6 +2,8 @@
 // and @canvas-ui/app-execute authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Code } from '@canvas-ui/app-db';
+
 import { ActionStatus } from '@canvas-ui/react-components/Status/types';
 import { BareProps } from '@canvas-ui/react-components/types';
 import { VoidFn } from '@canvas-ui/react-util/types';
@@ -42,17 +44,17 @@ export interface AppProps extends BareProps, WithBasePath {
   onStatusChange: (status: ActionStatus) => void;
 }
 
-interface CodeBase {
-  id: string;
-  codeHash: string;
-  name: string;
-  genesisHash: string;
-  tags: string[];
-}
+// interface CodeBase {
+//   id: string;
+//   codeHash: string;
+//   name: string;
+//   genesisHash: string;
+//   tags: string[];
+// }
 
-export interface Code extends CodeBase {
-  abi?: AnyJson | null;
-}
+// export interface Code extends CodeBase {
+//   abi?: AnyJson | null;
+// }
 
 // export interface Code extends CodeBase {
 //   abi: InkAbi | null;
@@ -70,9 +72,8 @@ export interface ContractJsonOld {
   name: string;
 }
 
-export interface WithCodes {
+export interface UseCodes {
   allCodes: Code[];
   hasCodes: boolean;
-  isLoading: boolean;
   updated: number;
 }

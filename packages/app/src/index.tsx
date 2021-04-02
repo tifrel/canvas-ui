@@ -8,6 +8,7 @@ import 'semantic-ui-css/semantic.min.css';
 import 'tippy.js/dist/tippy.css'; // optional
 import '@canvas-ui/react-components/i18n';
 
+import Database from '@canvas-ui/app-db';
 import { Api } from '@canvas-ui/react-api';
 import Queue from '@canvas-ui/react-components/Status/Queue';
 import { BlockAuthors, Events } from '@canvas-ui/react-query';
@@ -42,11 +43,13 @@ ReactDOM.render(
       <Queue>
         <Api url={settings.apiUrl}>
           <BlockAuthors>
-            <Events>
-              <HashRouter>
-                <Apps />
-              </HashRouter>
-            </Events>
+            <Database rpcUrl={settings.apiUrl}>
+              <Events>
+                <HashRouter>
+                  <Apps />
+                </HashRouter>
+              </Events>
+            </Database>
           </BlockAuthors>
         </Api>
       </Queue>

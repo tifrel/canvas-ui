@@ -43,6 +43,7 @@ interface InjectedAccountExt {
 }
 
 interface ChainData {
+  blockOneHash: string;
   injectedAccounts: InjectedAccountExt[];
   properties: ChainProperties;
   systemChain: string;
@@ -65,7 +66,7 @@ let api: ApiPromise;
 export { api };
 
 async function retrieve (api: ApiPromise): Promise<ChainData> {
-  const [properties, systemChain, systemChainType, systemName, systemVersion, injectedAccounts] = await Promise.all([
+  const [properties, systemChain, systemChainType, systemName, systemVersion, blockOneHash, injectedAccounts] = await Promise.all([
     api.rpc.system.properties(),
     api.rpc.system.chain(),
     api.rpc.system.chainType
@@ -73,6 +74,7 @@ async function retrieve (api: ApiPromise): Promise<ChainData> {
       : Promise.resolve(registry.createType('ChainType', 'Live')),
     api.rpc.system.name(),
     api.rpc.system.version(),
+    api.query.system.blockHash(1),
     injectedPromise
       .then(() => web3Accounts())
       .then((accounts) => accounts.map(({ address, meta }, whenCreated): InjectedAccountExt => ({
@@ -91,6 +93,7 @@ async function retrieve (api: ApiPromise): Promise<ChainData> {
   ]);
 
   return {
+    blockOneHash: blockOneHash.toString(),
     injectedAccounts,
     properties,
     systemChain: (systemChain || '<unknown>').toString(),
@@ -101,7 +104,7 @@ async function retrieve (api: ApiPromise): Promise<ChainData> {
 }
 
 async function loadOnReady (api: ApiPromise, store?: KeyringStore): Promise<ApiState> {
-  const { injectedAccounts, properties, systemChain, systemChainType, systemName, systemVersion } = await retrieve(api);
+  const { blockOneHash, injectedAccounts, properties, systemChain, systemChainType, systemName, systemVersion } = await retrieve(api);
   const ss58Format = uiSettings.prefix === -1
     ? properties.ss58Format.unwrapOr(DEFAULT_SS58).toNumber()
     : uiSettings.prefix;
@@ -144,6 +147,7 @@ async function loadOnReady (api: ApiPromise, store?: KeyringStore): Promise<ApiS
   return {
     apiDefaultTx,
     apiDefaultTxSudo,
+    blockOneHash,
     hasInjectedAccounts: injectedAccounts.length !== 0,
     isApiReady: true,
     isDevelopment,
