@@ -14,11 +14,6 @@ import Upload from './Upload';
 function UploadApp ({ basePath }: Props): React.ReactElement<Props> {
   const hasInstantiateWithCode = useHasInstantiateWithCode();
   const { navigateTo } = useAppNavigation();
-  const useCodesHook = useCodes();
-  const componentProps = useMemo(
-    (): ComponentProps => ({ ...useCodesHook, basePath }),
-    [useCodesHook, basePath]
-  );
 
   useEffect(
     (): void => {
@@ -33,7 +28,7 @@ function UploadApp ({ basePath }: Props): React.ReactElement<Props> {
     <main className='upload--App'>
       <Switch>
         <Route path={`${basePath}/success/:id`}>
-          <Success {...componentProps} />
+          <Success />
         </Route>
         <Route exact>
           <Upload />
