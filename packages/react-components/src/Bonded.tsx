@@ -2,7 +2,7 @@
 // and @canvas-ui/react-components authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Bonded } from '@canvas-ui/react-query';
+import Bonded from './BondedParent';
 import { classes } from '@canvas-ui/react-util';
 import BN from 'bn.js';
 import React from 'react';
@@ -12,7 +12,7 @@ import { AccountId, AccountIndex, Address } from '@polkadot/types/interfaces';
 import { renderProvided } from './Balance';
 import { BareProps } from './types';
 
-export interface Props extends BareProps {
+interface Props extends BareProps {
   bonded?: BN | BN[];
   label?: React.ReactNode;
   params?: AccountId | AccountIndex | Address | string | Uint8Array | null;

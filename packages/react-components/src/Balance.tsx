@@ -2,7 +2,9 @@
 // and @canvas-ui/react-components authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Balance, FormatBalance } from '@canvas-ui/react-query';
+
+import Balance from './BalanceParent'
+import FormatBalance from './FormatBalance'
 import { classes } from '@canvas-ui/react-util';
 import BN from 'bn.js';
 import React from 'react';
@@ -12,13 +14,13 @@ import { BN_ZERO } from '@polkadot/util';
 
 import { BareProps } from './types';
 
-export interface RenderProps extends BareProps {
+interface RenderProps extends BareProps {
   className?: string;
   label?: React.ReactNode;
   value?: BN | BN[];
 }
 
-export interface Props extends BareProps {
+interface Props extends BareProps {
   balance?: BN | BN[];
   label?: React.ReactNode;
   params?: AccountId | AccountIndex | Address | string | Uint8Array | null;

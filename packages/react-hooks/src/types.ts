@@ -2,14 +2,10 @@
 // and @canvas-ui/react-components authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ConstructTxFn } from '@canvas-ui/react-components/types';
 import { StringOrNull, VoidFn } from '@canvas-ui/react-util/types';
 import BN from 'bn.js';
 
-import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
 import { DeriveAccountFlags, DeriveAccountRegistration } from '@polkadot/api-derive/types';
-import { AccountId, Balance, BlockNumber, Call, Exposure, Hash, SessionIndex, StakingLedger, ValidatorPrefs } from '@polkadot/types/interfaces';
-import { IExtrinsic } from '@polkadot/types/types';
 import { KeyringJson$Meta } from '@polkadot/ui-keyring/types';
 
 export type CallParam = any;
@@ -22,60 +18,6 @@ export interface CallOptions <T> {
   paramMap?: (params: any) => CallParams;
   transform?: (value: any) => T;
   withParams?: boolean;
-}
-
-export type TxDef = [string, any[] | ConstructTxFn];
-
-export type TxDefs = SubmittableExtrinsic | IExtrinsic | Call | TxDef | null;
-
-export type TxSource<T extends TxDefs> = [T, boolean];
-
-export interface ModalState {
-  isOpen: boolean;
-  onOpen: () => void;
-  onClose: () => void;
-}
-
-export interface Slash {
-  accountId: AccountId;
-  amount: Balance;
-}
-
-export interface SessionRewards {
-  blockHash: Hash;
-  blockNumber: BlockNumber;
-  isEventsEmpty: boolean;
-  reward: Balance;
-  sessionIndex: SessionIndex;
-  slashes: Slash[];
-}
-
-export interface ExtrinsicAndSenders {
-  extrinsic: SubmittableExtrinsic | null;
-  isSubmittable: boolean;
-  sendTx: () => void;
-  sendUnsigned: () => void;
-}
-
-export interface TxProps {
-  accountId?: StringOrNull;
-  onChangeAccountId?: (_: StringOrNull) => void;
-  onSuccess?: () => void;
-  onFailed?: () => void;
-  onStart?: () => void;
-  onUpdate?: () => void;
-}
-
-export interface TxState extends ExtrinsicAndSenders {
-  isSending: boolean;
-  accountId?: StringOrNull;
-  onChangeAccountId: (_: StringOrNull) => void;
-}
-
-export interface UseSudo {
-  allAccounts: string[];
-  sudoKey?: string;
-  isMine: boolean;
 }
 
 export interface AddressFlags extends DeriveAccountFlags {
@@ -123,25 +65,6 @@ export interface UseAccountInfo {
   onForgetAddress: VoidFn;
 }
 
-export interface StakerState {
-  controllerId: string | null;
-  destination?: string;
-  destinationId: number;
-  exposure?: Exposure;
-  hexSessionIdNext: string | null;
-  hexSessionIdQueue: string | null;
-  isLoading: boolean;
-  isOwnController: boolean;
-  isOwnStash: boolean;
-  isStashNominating: boolean;
-  isStashValidating: boolean;
-  nominating?: string[];
-  sessionIds: string[];
-  stakingLedger?: StakingLedger;
-  stashId: string;
-  validatorPrefs?: ValidatorPrefs;
-}
-
 export interface UseWeight {
   executionTime: number;
   isEmpty: boolean;
@@ -173,4 +96,28 @@ export interface Endpoint extends EndpointUrl {
 export interface UseEndpoints extends Endpoint {
   onChangeUrl: (_: string) => void;
   onChangeCustom: (_: boolean) => void;
+}
+
+export interface AppNavigation {
+  instantiate: VoidFn;
+  instantiateAdd: VoidFn;
+  instantiateNew: (_?: string, __?: number) => VoidFn;
+  instantiateSuccess: (_: string) => VoidFn;
+  execute: VoidFn;
+  executeAdd: VoidFn;
+  executeCall: (_: string, __?: number) => VoidFn;
+  upload: VoidFn;
+  uploadSuccess: (_: string) => VoidFn;
+}
+
+export interface AppPaths {
+  instantiate: string;
+  instantiateAdd: string;
+  instantiateNew: (_?: string, __?: number) => string;
+  instantiateSuccess: (_: string) => string;
+  execute: string;
+  executeAdd: string;
+  executeCall: (_: string, __?: number) => string;
+  upload: string;
+  uploadSuccess: (_: string) => string;
 }

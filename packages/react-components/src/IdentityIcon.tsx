@@ -4,7 +4,7 @@
 
 import { getSystemIcon } from '@canvas-ui/app-config/ui';
 import { useApi, useNotification } from '@canvas-ui/react-hooks';
-import { ValidatorsContext } from '@canvas-ui/react-query';
+import { ValidatorsContext } from './BlockAuthors';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
@@ -14,7 +14,7 @@ import uiSettings from '@polkadot/ui-settings';
 
 import { useTranslation } from './translate';
 
-export function getIdentityTheme (systemName: string): 'substrate' {
+function getIdentityTheme (systemName: string): 'substrate' {
   return ((uiSettings.icon === 'default' && getSystemIcon(systemName)) || uiSettings.icon) as 'substrate';
 }
 
