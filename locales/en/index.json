@@ -27,6 +27,7 @@
   "apps-routing.json",
   "apps.json",
   "react-components.json",
+  "react-hooks.json",
   "react-params.json",
   "react-query.json",
   "react-signer.json",
