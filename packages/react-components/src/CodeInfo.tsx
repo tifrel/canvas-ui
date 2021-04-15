@@ -1,10 +1,10 @@
-// Copyright 2017-2021 @polkadot/app-execute authors & contributors
-// and @canvas-ui/app-execute authors & contributors
+// Copyright 2017-2021 @polkadot/react-components authors & contributors
+// and @canvas-ui/react-components authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { useNonEmptyString, useToggle } from '@canvas-ui/react-hooks';
 import store from '@canvas-ui/react-store/store';
 import { Code } from '@canvas-ui/react-store/types';
-import { useNonEmptyString, useToggle } from '@canvas-ui/react-hooks';
 import { truncate } from '@canvas-ui/react-util';
 import { faFile } from '@fortawesome/free-regular-svg-icons';
 import React, { useCallback } from 'react';

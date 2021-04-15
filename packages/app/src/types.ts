@@ -1,5 +1,5 @@
-// Copyright 2017-2021 @polkadot/app-execute authors & contributors
-// and @canvas-ui/app-execute authors & contributors
+// Copyright 2017-2021 @polkadot/apps authors & contributors
+// and @canvas-ui/app authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Code } from '@canvas-ui/app-db';
@@ -7,8 +7,6 @@ import type { Code } from '@canvas-ui/app-db';
 import { ActionStatus } from '@canvas-ui/react-api/Status/types';
 import { BareProps } from '@canvas-ui/react-components/types';
 import { VoidFn } from '@canvas-ui/react-util/types';
-
-import { AnyJson } from '@polkadot/types/types';
 
 export interface AppNavigation {
   instantiate: VoidFn;
@@ -37,6 +35,7 @@ export interface AppPaths {
 export interface WithBasePath {
   basePath: string;
 }
+<<<<<<< HEAD
 
 export interface ComponentProps extends BareProps, WithBasePath {}
 
@@ -77,3 +76,5 @@ export interface UseCodes {
   hasCodes: boolean;
   updated: number;
 }
+=======
+>>>>>>> master

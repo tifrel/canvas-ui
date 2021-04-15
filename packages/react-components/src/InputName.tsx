@@ -1,13 +1,13 @@
-// Copyright 2017-2021 @polkadot/app-execute authors & contributors
-// and @canvas-ui/app-execute authors & contributors
+// Copyright 2017-2021 @polkadot/react-components authors & contributors
+// and @canvas-ui/react-components authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { BareProps } from './types';
 import { VoidFn } from '@canvas-ui/react-util/types';
 import React from 'react';
 
 import Input from './Input';
 import { useTranslation } from './translate';
+import { BareProps } from './types';
 
 interface Props extends BareProps {
   isBusy?: boolean;

@@ -45,4 +45,3 @@ export interface CallState {
   callUpdated?: boolean;
   callUpdatedAt?: number;
 }
-
