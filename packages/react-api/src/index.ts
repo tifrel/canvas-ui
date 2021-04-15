@@ -4,13 +4,11 @@
 
 import Api, { api } from './Api';
 import ApiContext from './ApiContext';
-import {  getLedger } from './ledger';
 import registry from './typeRegistry';
 
 export {
   api,
   Api,
   ApiContext,
-  registry,
-  getLedger
+  registry
 };

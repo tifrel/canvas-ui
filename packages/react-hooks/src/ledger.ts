@@ -8,7 +8,7 @@ import { Ledger } from '@polkadot/ui-keyring';
 import uiSettings from '@polkadot/ui-settings';
 import { assert } from '@polkadot/util';
 
-import { api } from './Api';
+import { api } from '../../react-api/src/Api';
 
 const ALLOWED_CHAINS: [string, 'kusama' | 'polkadot'][] = [
   [KUSAMA_GENESIS, 'kusama'],
