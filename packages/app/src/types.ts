@@ -4,7 +4,7 @@
 
 import type { Code } from '@canvas-ui/app-db';
 
-import { ActionStatus } from '@canvas-ui/react-components/Status/types';
+import { ActionStatus } from '@canvas-ui/react-api/Status/types';
 import { BareProps } from '@canvas-ui/react-components/types';
 import { VoidFn } from '@canvas-ui/react-util/types';
 

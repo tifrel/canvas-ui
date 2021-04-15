@@ -1,13 +1,13 @@
 // Copyright 2017-2021 @canvas-ui/app-upload authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import store from '@canvas-ui/react-store/store';
 import { registry } from '@canvas-ui/react-api';
 import { Button, Input, InputABI, InputAddress, InputFile, TxButton } from '@canvas-ui/react-components';
-import PendingTx from '@canvas-ui/react-signer/PendingTx';
-import { useAbi, useAccountId, useApi, useFile, useNonEmptyString, useAppNavigation } from '@canvas-ui/react-hooks';
+import { useAbi, useAccountId, useApi, useAppNavigation, useDatabase, useFile, useNonEmptyString } from '@canvas-ui/react-hooks';
 import { FileState } from '@canvas-ui/react-hooks/types';
+import PendingTx from '@canvas-ui/react-signer/PendingTx';
 import usePendingTx from '@canvas-ui/react-signer/usePendingTx';
+import store from '@canvas-ui/react-store/store';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -20,6 +20,7 @@ function Upload (): React.ReactElement {
   const { t } = useTranslation();
   const { navigateTo, pathTo } = useAppNavigation();
   const { api } = useApi();
+  const { Code } = useDatabase();
   const [accountId, setAccountId] = useAccountId();
   const [name, setName, isNameValid, isNameError] = useNonEmptyString();
   const currentName = useRef(name);
@@ -87,14 +88,20 @@ function Upload (): React.ReactElement {
           return;
         }
 
-        store.saveCode({ abi: abi?.json || undefined, codeHash: codeHash.toHex(), name, tags: [] })
+        Code.create({ abi: abi?.json || undefined, codeHash: codeHash.toHex(), name, tags: [] })
           .then((id): void => navigateTo.uploadSuccess(id)())
           .catch((error: any): void => {
             console.error('Unable to save code', error);
           });
+
+        // store.saveCode({ abi: abi?.json || undefined, codeHash: codeHash.toHex(), name, tags: [] })
+        //   .then((id): void => navigateTo.uploadSuccess(id)())
+        //   .catch((error: any): void => {
+        //     console.error('Unable to save code', error);
+        //   });
       }
     },
-    [api, abi, name, navigateTo]
+    [api, abi, Code, name, navigateTo]
   );
 
   const additionalDetails = useMemo((): Record<string, string> => ({ name: name || '' }), [name]);
