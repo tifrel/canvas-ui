@@ -6,7 +6,7 @@ import { StatusContext } from '@canvas-ui/react-components';
 import { QueueTx, QueueTxMessageSetStatus } from '@canvas-ui/react-api/Status/types';
 import { useApi } from '@canvas-ui/react-hooks';
 import { StringOrNull, VoidFn } from '@canvas-ui/react-util/types';
-import ledgerSigner from './LedgerSigner';
+import useLedgerSigner, {LedgerSigner} from '@canvas-ui/react-hooks/useLedgerSigner'
 import { AddressFlags, AddressProxy } from './types';
 import { extractExternal, handleTxResults } from './util';
 
@@ -187,7 +187,7 @@ async function wrapTx (api: ApiPromise, currentItem: QueueTx, { isMultiCall, mul
   return tx;
 }
 
-async function extractParams (address: string, options: Partial<SignerOptions>, setQrState: (state: QrState) => void): Promise<['qr' | 'signing', KeyringPair | string, Partial<SignerOptions>]> {
+async function extractParams (address: string, ledgerSigner: LedgerSigner, options: Partial<SignerOptions>, setQrState: (state: QrState) => void): Promise<['qr' | 'signing', KeyringPair | string, Partial<SignerOptions>]> {
   const pair = keyring.getPair(address);
   const { meta: { isExternal, isHardware, isInjected, source } } = pair;
 
@@ -210,6 +210,7 @@ let qrId = 0;
 
 export default function useSendTx (source: QueueTx | null, requestAddress: string): UseSendTx {
   const currentItem = useMemo((): QueueTx | null => source, [source]);
+  const ledgerSigner = useLedgerSigner();
   const { api } = useApi();
   const { queueSetTxStatus } = useContext(StatusContext);
   const [flags, setFlags] = useState(extractExternal(requestAddress));
@@ -297,7 +298,7 @@ export default function useSendTx (source: QueueTx | null, requestAddress: strin
       if (_unlock() && currentItem?.extrinsic && senderInfo.signAddress) {
         const [tx, [status, pairOrAddress, options]] = await Promise.all([
           wrapTx(api, currentItem, senderInfo),
-          extractParams(senderInfo.signAddress, { tip }, setQrState)
+          extractParams(senderInfo.signAddress, ledgerSigner, { tip }, setQrState)
         ]);
 
         queueSetTxStatus(currentItem.id, status);
@@ -321,7 +322,7 @@ export default function useSendTx (source: QueueTx | null, requestAddress: strin
       if (_unlock() && currentItem && senderInfo.signAddress) {
         const [tx, [, pairOrAddress, options]] = await Promise.all([
           wrapTx(api, currentItem, senderInfo),
-          extractParams(senderInfo.signAddress, { ...signedOptions, tip }, setQrState)
+          extractParams(senderInfo.signAddress, ledgerSigner, { ...signedOptions, tip }, setQrState)
         ]);
 
         setSignedTx(await signAsync(queueSetTxStatus, currentItem, tx, pairOrAddress, options));
