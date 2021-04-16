@@ -35,7 +35,6 @@ export interface AppPaths {
 export interface WithBasePath {
   basePath: string;
 }
-<<<<<<< HEAD
 
 export interface ComponentProps extends BareProps, WithBasePath {}
 
@@ -76,5 +75,3 @@ export interface UseCodes {
   hasCodes: boolean;
   updated: number;
 }
-=======
->>>>>>> master

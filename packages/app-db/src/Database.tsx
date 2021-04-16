@@ -38,13 +38,14 @@ function isLocalNode (rpcUrl: string): boolean {
   return !rpcUrl.includes('127.0.0.1');
 }
 
-async function initDb (rpcUrl: string, isRemote = false): Promise<DB> {
+async function initDb (rpcUrl: string, isRemote = false): Promise<[DB, PrivateKey | null]> {
   const db = await new DB(
     rpcUrl,
     { name: 'User', schema: user },
     { name: 'Contract', schema: contract },
     { name: 'Code', schema: code }
   ).open(1);
+  let identity = null;
 
   if (isRemote && !isLocalNode(rpcUrl)) {
     try {
@@ -59,9 +60,9 @@ async function initDb (rpcUrl: string, isRemote = false): Promise<DB> {
 
       const remote = await db.remote.setKeyInfo(info);
 
-      const privateKey = getPrivateKey();
+      identity = getPrivateKey();
 
-      await remote.authorize(privateKey);
+      await remote.authorize(identity);
 
       const threadId = ThreadID.fromString(rpcUrl);
 
@@ -72,7 +73,7 @@ async function initDb (rpcUrl: string, isRemote = false): Promise<DB> {
     }
   }
 
-  return db;
+  return [db, identity];
 }
 
 function Database ({ children, rpcUrl }: Props): React.ReactElement<Props> | null {
@@ -80,6 +81,7 @@ function Database ({ children, rpcUrl }: Props): React.ReactElement<Props> | nul
   // const { chainName, isDevelopment } = useApi();
 
   const [db, setDb] = useState<DB>(new DB(''));
+  const [identity, setIdentity] = useState<PrivateKey | null>(null);
   const [isDbReady, setIsDbReady] = useState(false);
 
   const isRemote = useMemo(
@@ -91,9 +93,10 @@ function Database ({ children, rpcUrl }: Props): React.ReactElement<Props> | nul
   useEffect((): void => {
     async function createDb () {
       try {
-        const db = await initDb(rpcUrl, isRemote);
+        const [db, identity] = await initDb(rpcUrl, isRemote);
 
         setDb(db);
+        setIdentity(identity);
         setIsDbReady(true);
       } catch (e) {
         console.error(e);
@@ -108,8 +111,8 @@ function Database ({ children, rpcUrl }: Props): React.ReactElement<Props> | nul
   }, []);
 
   const props = useMemo<DbProps>(
-    () => ({ db, isDbReady }),
-    [db, isDbReady]
+    () => ({ db, identity, isDbReady }),
+    [db, identity, isDbReady]
   );
 
   if (!db || !props.isDbReady) {

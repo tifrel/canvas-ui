@@ -8,7 +8,21 @@
         "_id": {
             "description": "Field to contain ulid-based instance id",
             "type": "string"
-        },      
+        },
+        "codeBundles": {
+            "description": "Addresses of saved smart contracts",
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "contracts": {
+            "description": "Addresses of saved smart contracts",
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
         "publicKey": {
             "description": "The user's public key",
             "type": "string"

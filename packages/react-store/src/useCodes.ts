@@ -2,31 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Code } from '@canvas-ui/app-db/types';
+import type { UseCodes } from './types';
 
 import { useApi, useDatabase } from '@canvas-ui/react-hooks';
 import { Client, PrivateKey, ThreadID, Update } from '@textile/hub';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import store from './store';
-import type { UseCodes } from './types';
-
-// const userID = PrivateKey.fromRandom()
-
-// interface Astronaut {
-//   _id: string
-//   name: string
-//   missions: number
-// }
-// const callback = async (reply?: Update<Astronaut>, err?: Error) => {
-//   console.log(reply.instance)
-// }
-
-// // Requires userID already be authenticated to the Users API
-// async function startListener(client: Client, threadID: ThreadID) {
-//   const filters = [{actionTypes: ['CREATE']}]
-//   const closer = client.listen<Astronaut>(threadID, filters, callback)
-//   return closer
-// }
 
 export default function useCodes (): WithCodes {
   const { blockOneHash, isDevelopment } = useApi();

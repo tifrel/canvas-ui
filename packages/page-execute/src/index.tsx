@@ -3,7 +3,7 @@
 
 import { WithLoader } from '@canvas-ui/react-components';
 import { AppProps as Props } from '@canvas-ui/react-components/types';
-import { useAccounts, useContracts } from '@canvas-ui/react-hooks';
+import { useAccounts, useContracts, useDatabase } from '@canvas-ui/react-hooks';
 import { classes } from '@canvas-ui/react-util';
 import React, { useMemo } from 'react';
 import { Route, Switch } from 'react-router';

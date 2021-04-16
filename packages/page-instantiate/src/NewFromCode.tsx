@@ -10,7 +10,7 @@ import { Button, Dropdown, Input, InputABI, InputAddress, InputBalance, InputMeg
 import { extractValues } from '@canvas-ui/react-components/Params/values';
 import { ELEV_2_CSS } from '@canvas-ui/react-components/styles/constants';
 import { RawParam } from '@canvas-ui/react-components/types';
-import { useAbi, useAccountId, useApi, useAppNavigation, useFile, useGasWeight, useNonEmptyString, useNonZeroBn, useStepper } from '@canvas-ui/react-hooks';
+import { useAbi, useAccountId, useApi, useAppNavigation, useDatabase, useFile, useGasWeight, useNonEmptyString, useNonZeroBn, useStepper } from '@canvas-ui/react-hooks';
 import { ContractParams } from '@canvas-ui/react-params';
 import PendingTx from '@canvas-ui/react-signer/PendingTx';
 import usePendingTx from '@canvas-ui/react-signer/usePendingTx';
@@ -38,6 +38,7 @@ function NewFromCode ({ className }: Props): React.ReactElement<Props> | null {
   // const { id, index = '0' }: { id: string, index?: string } = useParams();
   const { t } = useTranslation();
   const { api } = useApi();
+  const { createCode, createContract } = useDatabase();
   const { navigateTo } = useAppNavigation();
   const hasInstantiateWithCode = !!api.tx.contracts.instantiateWithCode;
   // const code = useMemo(
@@ -168,7 +169,11 @@ function NewFromCode ({ className }: Props): React.ReactElement<Props> | null {
   );
 
   const _onSuccess = useCallback(
-    (result: SubmittableResult): void => {
+    async (result: SubmittableResult): Promise<void> => {
+      if (!codeName || !contractName) {
+        return;
+      }
+
       const section = api.tx.contracts ? 'contracts' : 'contract';
 
       const codeStoredRecord = result.findRecord(section, 'CodeStored');
@@ -180,11 +185,14 @@ function NewFromCode ({ className }: Props): React.ReactElement<Props> | null {
           return;
         }
 
-        store.saveCode({ abi: abi?.json || undefined, codeHash: codeHash.toHex(), name: codeName, tags: [] })
-          .then(() => { console.log('Saved code'); })
-          .catch((error: any): void => {
-            console.error('Unable to save code', error);
-          });
+        await createCode(
+          {
+            abi: abi?.json,
+            codeHash: codeHash.toHex(),
+            name: codeName,
+            tags: []
+          }
+        );
       }
 
       const instantiatedRecords = result.filterRecords(section, 'Instantiated');
@@ -194,19 +202,20 @@ function NewFromCode ({ className }: Props): React.ReactElement<Props> | null {
         // more clever here to find the exact contract deployed, this works for eg. Delegator)
         const address = instantiatedRecords[instantiatedRecords.length - 1].event.data[1] as unknown as AccountId;
 
-        keyring.saveContract(address.toString(), {
-          contract: {
-            abi: abi?.json || undefined,
-            genesisHash: api.genesisHash.toHex()
+        await createContract(
+          {
+            abi: abi?.json,
+            address: address.toString(),
+            name: contractName,
+            tags: []
           },
-          name: contractName,
-          tags: []
-        });
-
-        navigateTo.instantiateSuccess(address.toString())();
+          (address: string) => {
+            return () => navigateTo.instantiateSuccess(address.toString())();
+          }
+        );
       }
     },
-    [abi, api, codeName, contractName, navigateTo]
+    [abi, api, createCode, createContract, codeName, contractName, navigateTo]
   );
 
   const additionalDetails = useMemo(

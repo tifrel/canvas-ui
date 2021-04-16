@@ -1,6 +1,7 @@
 // Copyright 2017-2021 @canvas-ui/app-upload authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { identityNodes } from '@canvas-ui/app-config/ui/identityIcons';
 import { registry } from '@canvas-ui/react-api';
 import { Button, Input, InputABI, InputAddress, InputFile, TxButton } from '@canvas-ui/react-components';
 import { useAbi, useAccountId, useApi, useAppNavigation, useDatabase, useFile, useNonEmptyString } from '@canvas-ui/react-hooks';
@@ -19,8 +20,8 @@ import { useTranslation } from './translate';
 function Upload (): React.ReactElement {
   const { t } = useTranslation();
   const { navigateTo, pathTo } = useAppNavigation();
-  const { api } = useApi();
-  const { Code } = useDatabase();
+  const { api, blockOneHash } = useApi();
+  const { createCode, identity } = useDatabase();
   const [accountId, setAccountId] = useAccountId();
   const [name, setName, isNameValid, isNameError] = useNonEmptyString();
   const currentName = useRef(name);
@@ -88,20 +89,20 @@ function Upload (): React.ReactElement {
           return;
         }
 
-        Code.create({ abi: abi?.json || undefined, codeHash: codeHash.toHex(), name, tags: [] })
-          .then((id): void => navigateTo.uploadSuccess(id)())
-          .catch((error: any): void => {
-            console.error('Unable to save code', error);
-          });
-
-        // store.saveCode({ abi: abi?.json || undefined, codeHash: codeHash.toHex(), name, tags: [] })
-        //   .then((id): void => navigateTo.uploadSuccess(id)())
-        //   .catch((error: any): void => {
-        //     console.error('Unable to save code', error);
-        //   });
+        createCode(
+          {
+            abi: abi?.json,
+            codeHash: codeHash.toHex(),
+            name,
+            tags: []
+          },
+          (id: string) => {
+            return () => navigateTo.uploadSuccess(id)();
+          }
+        );
       }
     },
-    [api, abi, Code, name, navigateTo]
+    [api, abi, createCode, name, navigateTo]
   );
 
   const additionalDetails = useMemo((): Record<string, string> => ({ name: name || '' }), [name]);

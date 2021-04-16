@@ -5,7 +5,7 @@ import { Button, Dropdown, Input, InputAddress, InputBalance, InputMegaGas, Inpu
 import useTxParams from '@canvas-ui/react-components/Params/useTxParams';
 import { extractValues } from '@canvas-ui/react-components/Params/values';
 import { ELEV_2_CSS } from '@canvas-ui/react-components/styles/constants';
-import { useAbi, useAccountId, useApi, useAppNavigation, useGasWeight, useNonEmptyString, useNonZeroBn } from '@canvas-ui/react-hooks';
+import { useAbi, useAccountId, useApi, useAppNavigation, useDatabase, useGasWeight, useNonEmptyString, useNonZeroBn } from '@canvas-ui/react-hooks';
 import { ContractParams } from '@canvas-ui/react-params';
 import PendingTx from '@canvas-ui/react-signer/PendingTx';
 import usePendingTx from '@canvas-ui/react-signer/usePendingTx';
@@ -20,7 +20,7 @@ import { SubmittableResult } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { BlueprintPromise as Blueprint } from '@polkadot/api-contract';
 import { AccountId } from '@polkadot/types/interfaces';
-import keyring from '@polkadot/ui-keyring';
+// import keyring from '@polkadot/ui-keyring';
 import { randomAsHex } from '@polkadot/util-crypto';
 
 // import { ABI, InputMegaGas, InputName, MessageSignature, Params } from './shared';
@@ -39,6 +39,7 @@ function New ({ allCodes, className }: Props): React.ReactElement<Props> | null 
   const { id, index = '0' }: { id: string, index?: string } = useParams();
   const { t } = useTranslation();
   const { api } = useApi();
+  const { createContract } = useDatabase();
   const { navigateTo } = useAppNavigation();
   const code = useMemo(
     (): Code | null => {
@@ -131,19 +132,20 @@ function New ({ allCodes, className }: Props): React.ReactElement<Props> | null 
         // more clever here to find the exact contract deployed, this works for eg. Delegator)
         const address = records[records.length - 1].event.data[1] as unknown as AccountId;
 
-        keyring.saveContract(address.toString(), {
-          contract: {
-            abi: abi?.json || undefined,
-            genesisHash: api.genesisHash.toHex()
+        name && createContract(
+          {
+            abi: abi?.json,
+            address: address.toString(),
+            name,
+            tags: []
           },
-          name,
-          tags: []
-        });
-
-        navigateTo.instantiateSuccess(address.toString())();
+          (address: string) => {
+            return () => navigateTo.instantiateSuccess(address.toString())();
+          }
+        );
       }
     },
-    [abi, api, name, navigateTo]
+    [abi, api, createContract, name, navigateTo]
   );
 
   const additionalDetails = useMemo(

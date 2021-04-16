@@ -3,19 +3,21 @@
 
 // Moved from @canvas-ui/apps -> react-store
 
-import { AnyJson } from '@polkadot/types/types';
+import type { Code } from '@canvas-ui/app-db/types';
 
-interface CodeBase {
-  id: string;
-  codeHash: string;
-  name: string;
-  genesisHash: string;
-  tags: string[];
-}
+// import { AnyJson } from '@polkadot/types/types';
 
-export interface Code extends CodeBase {
-  abi?: AnyJson | null;
-}
+// interface CodeBase {
+//   id: string;
+//   codeHash: string;
+//   name: string;
+//   genesisHash: string;
+//   tags: string[];
+// }
+
+// export interface Code extends CodeBase {
+//   abi?: AnyJson | null;
+// }
 
 // export interface Code extends CodeBase {
 //   abi: InkAbi | null;
