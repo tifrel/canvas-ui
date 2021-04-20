@@ -7,7 +7,6 @@ import type { AccountId } from '@polkadot/types/interfaces';
 import type { ComponentProps as Props } from './types';
 
 import { Button, Dropdown, Input, InputABI, InputAddress, InputBalance, InputMegaGas, InputName, MessageArg, MessageSignature, Toggle, TxButton } from '@canvas-ui/react-components';
-import { extractValues } from '@canvas-ui/react-components/Params/values';
 import { ELEV_2_CSS } from '@canvas-ui/react-components/styles/constants';
 import { RawParam } from '@canvas-ui/react-components/types';
 import { useAbi, useAccountId, useApi, useAppNavigation, useFile, useGasWeight, useNonEmptyString, useNonZeroBn, useStepper } from '@canvas-ui/react-hooks';
@@ -137,10 +136,10 @@ function NewFromCode ({ className }: Props): React.ReactElement<Props> | null {
     let error: string | null = null;
 
     try {
-      const { identifier } = abi?.constructors[constructorIndex];
+      const { args, identifier } = abi.constructors[constructorIndex];
 
       contract = code && identifier && endowment
-        ? code.tx[identifier]({ gasLimit: weight, salt: withSalt ? salt : null, value: endowment }, ...extractValues(params))
+        ? code.tx[identifier]({ gasLimit: weight, salt: withSalt ? salt : null, value: endowment }, ...args)
         : null;
     } catch (e) {
       error = (e as Error).message;
@@ -345,24 +344,24 @@ function NewFromCode ({ className }: Props): React.ReactElement<Props> | null {
               />
             )}
             {step === 2 && (
-              <>
-                <Button
-                  icon='caret-left'
-                  isDisabled={!abi}
-                  label={t<string>('Edit Code Bundle')}
-                  onClick={prevStep}
-                />
-                <TxButton
-                  accountId={accountId}
-                  extrinsic={uploadTx}
-                  icon='cloud-upload-alt'
-                  isDisabled={!isValid}
-                  isPrimary
-                  label={t<string>('Instantiate')}
-                  onSuccess={_onSuccess}
-                  withSpinner
-                />
-              </>
+
+              <Button
+                icon='caret-left'
+                isDisabled={!abi}
+                label={t<string>('Edit Code Bundle')}
+                onClick={prevStep}
+              />
+            )}
+            {abi && (<TxButton
+              accountId={accountId}
+              extrinsic={uploadTx}
+              icon='cloud-upload-alt'
+              isDisabled={!isValid}
+              isPrimary
+              label={t<string>('Instantiate')}
+              onSuccess={_onSuccess}
+              withSpinner
+            />
             )}
           </Button.Group>
         </section>
