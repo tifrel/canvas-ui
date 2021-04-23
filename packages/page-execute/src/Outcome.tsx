@@ -18,6 +18,7 @@ interface Props extends BareProps {
 }
 
 function Outcome ({ className, onClear, outcome: { from, message, output, params, result, when }, registry }: Props): React.ReactElement<Props> | null {
+  console.log('result: ', result)
   return (
     <div className={className}>
       <div className='info'>

@@ -14,6 +14,7 @@ import BN from 'bn.js';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
+import { keyring } from '@polkadot/ui-keyring';
 
 import { ContractPromise as Contract } from '@polkadot/api-contract';
 import { BN_ZERO, isNull } from '@polkadot/util';
@@ -144,7 +145,8 @@ function Call ({ className }: Props): React.ReactElement<Props> | null {
   const _onSubmitRpc = useCallback(
     (): void => {
       if (!accountId || !contract || !payment || !weight) return;
-
+      contract.query.get(accountId,{value: 0, gasLimit: 1632000000}).then((res)=>console.log('err: ',res.result.asErr.asModule['message'].value.toString()))
+      contract.query.get(accountId,{value: 0, gasLimit: 1632000000}).then((res)=>console.log(JSON.parse(JSON.stringify(res.result)).err))
       !!contract && contract
         .read(messageIndex, 0, weight.toString(), ...extractValues(values))
         .send(accountId)
