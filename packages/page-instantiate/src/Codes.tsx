@@ -1,23 +1,27 @@
 // Copyright 2017-2021 @canvas-ui/app-instantiate authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Button, CodeCard } from '@canvas-ui/react-components';
+import type { ComponentProps as Props } from '@canvas-ui/react-components/types';
+
+import { Button, CodeCard, WithLoader } from '@canvas-ui/react-components';
 import { useAppNavigation, useHasInstantiateWithCode } from '@canvas-ui/react-hooks';
+import useCodes from '@canvas-ui/react-store/useCodes';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { useTranslation } from './translate';
-import { ComponentProps as Props } from './types';
 
-function Codes ({ allCodes, basePath, className, hasCodes }: Props): React.ReactElement<Props> {
+function Codes ({ basePath, className }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { navigateTo, pathTo } = useAppNavigation();
   const hasInstantiateWithCode = useHasInstantiateWithCode();
+  const { allCodes, hasCodes, isLoading } = useCodes();
 
   const uploadPath = hasInstantiateWithCode ? pathTo.instantiateNew() : pathTo.upload;
 
   return (
+    <WithLoader isLoading={isLoading}>
     <div className={className}>
       <header>
         <h1>{t(hasCodes ? 'Instantiate New Contract' : 'No code bundle available')}</h1>
@@ -90,6 +94,7 @@ function Codes ({ allCodes, basePath, className, hasCodes }: Props): React.React
         </div>
       </section>
     </div>
+    </WithLoader>
   );
 }
 

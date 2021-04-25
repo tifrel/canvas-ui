@@ -8,27 +8,31 @@ import type { Collection } from '@textile/threaddb';
 // import { Abi } from '@polkadot/api-contract';
 import type { AnyJson } from '@polkadot/types/types';
 
-import { DbContext } from '@canvas-ui/app-db';
+import { DbContext, getPrivateKey } from '@canvas-ui/app-db';
+import { useApi } from '@canvas-ui/react-hooks';
+import { nanoid } from 'nanoid';
 import { useCallback, useContext } from 'react';
 
 import keyring from '@polkadot/ui-keyring';
-
-import useApi from './useApi';
 
 interface UseDb extends DbProps {
   User: Collection<User>;
   addCodeForUser: (id: string) => void;
   addContractForUser: (id: string) => void;
-  createCode: (newCode: CodeFields, onSuccess?: CreateOnSuccess) => Promise<void>;
-  createContract: (newContract: ContractFields, onSuccess: CreateOnSuccess) => Promise<void>;
+  createCode: (newCode: CodeFields, onSuccess?: CreateOnSuccess) => Promise<string>;
+  createContract: (newContract: ContractFields, onSuccess: CreateOnSuccess) => Promise<string>;
   findCodes: () => Promise<Code[]>;
+  findCodeByHash: (codeHash: string) => Promise<Code | null>;
+  findCodeById: (id: string) => Promise<Code | null>;
   findContracts: () => Promise<Contract[]>;
-  removeCode: (id: string, onSuccess: VoidFn) => void,
+  findContractByAddress: (address: string) => Promise<Contract | null>;
+  findUser: () => Promise<User | null>;
+  removeCode: (id: string) => Promise<void>,
   removeCodeForUser: (id: string) => void,
-  removeContract: (address: string, onSuccess: VoidFn) => void,
+  removeContract: (address: string) => Promise<void>,
   removeContractForUser: (address: string) => void;
-  updateCode: (id: string, updates: CodeFields, onSuccess: VoidFn) => void,
-  updateContract: (address: string, updates: ContractFields, onSuccess: VoidFn) => void,
+  updateCode: (id: string, updates: CodeFields) => Promise<string>,
+  updateContract: (address: string, updates: ContractFields) => Promise<string>,
 }
 
 interface ContractFields {
@@ -47,6 +51,10 @@ interface CodeFields {
 
 type CreateOnSuccess = (uid: string) => () => void
 
+function newCodeId (): string {
+  return nanoid(8);
+}
+
 export default function useDatabase (): UseDb {
   const { api, blockOneHash, isDevelopment } = useApi();
   const { db, identity, isDbReady } = useContext(DbContext);
@@ -55,11 +63,37 @@ export default function useDatabase (): UseDb {
   const Contract = db.collection('Contract') as Collection<Contract>;
   const User = db.collection('User') as Collection<User>;
 
+  const findUser = useCallback(
+    async (): Promise<User | null> => {
+      const identity = getPrivateKey();
+      const result = await User.findOne({ publicKey: identity?.pubKey.toString() });
+
+      return result || null;
+    },
+    [User]
+  );
+
   const findCodes = useCallback(
     async (): Promise<Code[]> => {
-      return Code.find({ blockOneHash, owner: isDevelopment ? identity?.pubKey.toString() : undefined }).toArray();
+      const result = Code.find({ blockOneHash, owner: isDevelopment ? identity?.pubKey.toString() : undefined });
+
+      return result ? (await result.toArray()) : [];
     },
     [blockOneHash, identity?.pubKey, isDevelopment, Code]
+  );
+
+  const findCodeByHash = useCallback(
+    async (codeHash: string): Promise<Code | null> => {
+      return await Code.findOne({ blockOneHash, codeHash }) || null;
+    },
+    [blockOneHash, Code]
+  );
+
+  const findCodeById = useCallback(
+    async (id: string): Promise<Code | null> => {
+      return await Code.findOne({ id }) || null;
+    },
+    [Code]
   );
 
   const findContracts = useCallback(
@@ -67,6 +101,13 @@ export default function useDatabase (): UseDb {
       return Contract.find({ blockOneHash, owner: isDevelopment ? identity?.pubKey.toString() : undefined }).toArray();
     },
     [blockOneHash, identity?.pubKey, isDevelopment, Contract]
+  );
+
+  const findContractByAddress = useCallback(
+    async (address: string): Promise<Contract | null> => {
+      return await Contract.findOne({ address }) || null;
+    },
+    [Contract]
   );
 
   const addCodeForUser = useCallback(
@@ -134,65 +175,71 @@ export default function useDatabase (): UseDb {
   );
 
   const createCode = useCallback(
-    async ({ abi, codeHash, name, tags = [] }: CodeFields, onSuccess?: CreateOnSuccess): Promise<void> => {
+    async ({ abi, codeHash, name, tags = [] }: CodeFields): Promise<string> => {
       if (!codeHash || !name) {
-        return;
+        return Promise.reject(new Error('Missing codeHash or name'));
       }
+
+      const id = newCodeId();
 
       const newCode = Code.create({
         abi,
         blockOneHash,
         codeHash,
         genesisHash: api.genesisHash.toHex(),
+        id,
         name,
         owner: identity?.pubKey.toString(),
         tags
       });
 
-      const id = newCode._id;
-
       await addCodeForUser(id);
 
-      newCode.save()
-        .then(onSuccess ? onSuccess(id) : undefined)
-        .catch((error: any): void => {
-          console.error('Unable to save code', error);
-        });
+      await newCode.save();
+
+      return Promise.resolve(id);
     },
     [addCodeForUser, Code, api.genesisHash, blockOneHash, identity?.pubKey]
   );
 
   const updateCode = useCallback(
-    async (id: string, { name, tags }: CodeFields, onSuccess?: () => void) => {
+    async (id: string, { abi, name, tags }: CodeFields): Promise<string> => {
       const code = await Code.findById(id);
 
       if (code) {
         if (name) code.name = name;
         if (tags) code.tags = tags;
+        if (abi) code.abi = abi;
 
-        await code.save();
-
-        onSuccess && onSuccess();
+        return code.save();
       }
+
+      return Promise.reject(new Error('Contract does not exist'));
     },
     [Code]
   );
 
   const removeCode = useCallback(
-    async (id: string, onSuccess: () => void) => {
+    async (id: string): Promise<void> => {
+      const user = await findUser();
+      const existing = await findCodeById(id);
+      const isOwned = user?.publicKey === existing?.owner;
+
       await removeCodeForUser(id);
 
-      await Code.delete(id);
+      if (isOwned) {
+        return Code.delete(id);
+      }
 
-      onSuccess && onSuccess();
+      return Promise.resolve();
     },
-    [Code, removeCodeForUser]
+    [Code, findCodeById, findUser, removeCodeForUser]
   );
 
   const createContract = useCallback(
-    async ({ abi, address, name, tags = [] }: ContractFields, onSuccess?: CreateOnSuccess): Promise<void> => {
+    async ({ abi, address, name, tags = [] }: ContractFields): Promise<string> => {
       if (!address || !name) {
-        return;
+        return Promise.reject(new Error('Missing address or name'));
       }
 
       const newContract = Contract.create({
@@ -216,40 +263,50 @@ export default function useDatabase (): UseDb {
 
       await addContractForUser(address);
 
-      newContract.save()
-        .then(onSuccess ? onSuccess(address) : undefined)
-        .catch((error: any): void => {
-          console.error('Unable to save code', error);
-        });
+      await newContract.save();
+
+      return Promise.resolve(address);
     },
     [addContractForUser, Contract, api.genesisHash, blockOneHash, identity?.pubKey]
   );
 
   const updateContract = useCallback(
-    async (id: string, { name, tags }: ContractFields, onSuccess: () => void) => {
+    async (id: string, { name, tags }: ContractFields): Promise<string> => {
       const contract = await Contract.findById(id);
 
       if (contract) {
         if (name) contract.name = name;
         if (tags) contract.tags = tags;
 
-        await contract.save();
-
-        onSuccess && onSuccess();
+        return contract.save();
       }
+
+      return Promise.reject(new Error('Contract does not exist'));
     },
     [Contract]
   );
 
   const removeContract = useCallback(
-    async (address: string, onSuccess: () => void) => {
-      await removeContractForUser(address);
+    async (address: string): Promise<void> => {
+      try {
+        const user = await findUser();
+        const existing = await findContractByAddress(address);
+        const isOwned = user?.publicKey === existing?.owner;
 
-      await Code.delete(address);
+        keyring.forgetContract(address);
 
-      onSuccess && onSuccess();
+        await removeContractForUser(address);
+
+        if (isOwned) {
+          return Code.delete(address);
+        }
+
+        return Promise.resolve();
+      } catch (e) {
+        return Promise.reject(new Error(e));
+      }
     },
-    [Code, removeContractForUser]
+    [Code, findContractByAddress, findUser, removeContractForUser]
   );
 
   return {
@@ -259,8 +316,12 @@ export default function useDatabase (): UseDb {
     createCode,
     createContract,
     db,
+    findCodeByHash,
+    findCodeById,
     findCodes,
+    findContractByAddress,
     findContracts,
+    findUser,
     identity,
     isDbReady,
     removeCode,

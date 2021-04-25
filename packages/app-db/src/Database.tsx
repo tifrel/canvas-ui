@@ -45,7 +45,7 @@ async function initDb (rpcUrl: string, isRemote = false): Promise<[DB, PrivateKe
     { name: 'Contract', schema: contract },
     { name: 'Code', schema: code }
   ).open(1);
-  let identity = null;
+  const identity = getPrivateKey();
 
   if (isRemote && !isLocalNode(rpcUrl)) {
     try {
@@ -59,8 +59,6 @@ async function initDb (rpcUrl: string, isRemote = false): Promise<[DB, PrivateKe
       };
 
       const remote = await db.remote.setKeyInfo(info);
-
-      identity = getPrivateKey();
 
       await remote.authorize(identity);
 

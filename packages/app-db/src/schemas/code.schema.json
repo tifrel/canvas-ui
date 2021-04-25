@@ -8,7 +8,11 @@
         "_id": {
             "description": "Field to contain ulid-based instance id",
             "type": "string"
-        },      
+        },
+        "id": {
+            "description": "Unique url id",
+            "type": "string"
+        },
         "owner": {
             "description": "The public key of the original uploader",
             "type": "string"

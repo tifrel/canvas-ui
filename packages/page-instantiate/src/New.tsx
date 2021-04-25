@@ -1,31 +1,33 @@
 // Copyright 2017-2021 @canvas-ui/app-instantiate authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Code } from '@canvas-ui/app-db/types';
+import type { BareProps as Props } from '@canvas-ui/react-components/types';
+import type { SubmittableResult } from '@polkadot/api';
+import type { SubmittableExtrinsic } from '@polkadot/api/types';
+import type { AccountId } from '@polkadot/types/interfaces';
+
+import useDatabase from '@canvas-ui/app-db/useDatabase';
 import { Button, Dropdown, Input, InputAddress, InputBalance, InputMegaGas, InputName, Labelled, MessageArg, MessageSignature, Toggle, TxButton } from '@canvas-ui/react-components';
 import useTxParams from '@canvas-ui/react-components/Params/useTxParams';
 import { extractValues } from '@canvas-ui/react-components/Params/values';
 import { ELEV_2_CSS } from '@canvas-ui/react-components/styles/constants';
-import { useAbi, useAccountId, useApi, useAppNavigation, useDatabase, useGasWeight, useNonEmptyString, useNonZeroBn } from '@canvas-ui/react-hooks';
+import { useAbi, useAccountId, useApi, useAppNavigation, useGasWeight, useNonEmptyString, useNonZeroBn } from '@canvas-ui/react-hooks';
 import { ContractParams } from '@canvas-ui/react-params';
 import PendingTx from '@canvas-ui/react-signer/PendingTx';
 import usePendingTx from '@canvas-ui/react-signer/usePendingTx';
-import { Code } from '@canvas-ui/react-store/types';
 import { truncate } from '@canvas-ui/react-util';
 import BN from 'bn.js';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { SubmittableResult } from '@polkadot/api';
-import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { BlueprintPromise as Blueprint } from '@polkadot/api-contract';
-import { AccountId } from '@polkadot/types/interfaces';
 // import keyring from '@polkadot/ui-keyring';
 import { randomAsHex } from '@polkadot/util-crypto';
 
 // import { ABI, InputMegaGas, InputName, MessageSignature, Params } from './shared';
 import { useTranslation } from './translate';
-import { ComponentProps as Props } from './types';
 
 type ConstructOptions = { key: string; text: React.ReactNode; value: string }[];
 
@@ -35,20 +37,29 @@ function defaultContractName (name?: string) {
   return name ? `${name} (instance)` : '';
 }
 
-function New ({ allCodes, className }: Props): React.ReactElement<Props> | null {
+function New ({ className }: Props): React.ReactElement | null {
   const { id, index = '0' }: { id: string, index?: string } = useParams();
   const { t } = useTranslation();
   const { api } = useApi();
-  const { createContract } = useDatabase();
+  const { createContract, findCodeById } = useDatabase();
   const { navigateTo } = useAppNavigation();
-  const code = useMemo(
-    (): Code | null => {
-      return allCodes.find((code: Code) => id === code.id) || null;
-    },
-    [allCodes, id]
-  );
+  // const code = useMemo(
+  //   (): Code | null => {
+  //     return allCodes.find((code: Code) => id === code.id) || null;
+  //   },
+  //   [allCodes, id]
+  // );
   const useWeightHook = useGasWeight();
   const { isValid: isWeightValid, weight } = useWeightHook;
+  const [code, setCode] = useState<Code | null>(null);
+
+  useEffect(
+    (): void => {
+      findCodeById(id).then((code) => setCode(code || null)).catch((e) => console.error(e));
+    },
+    [findCodeById, id]
+  );
+
   const [accountId, setAccountId] = useAccountId();
   const [endowment, setEndowment, isEndowmentValid] = useNonZeroBn(ENDOWMENT);
   const [constructorIndex, setConstructorIndex] = useState(parseInt(index, 10) || 0);

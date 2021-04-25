@@ -3,34 +3,29 @@
 
 // Moved from @canvas-ui/apps -> react-store
 
-import type { Code } from '@canvas-ui/app-db/types';
+import type { Code, Contract as ContractDocument } from '@canvas-ui/app-db/types';
+import type { VoidFn } from '@canvas-ui/react-util/types';
+import type { ContractPromise } from '@polkadot/api-contract';
 
-// import { AnyJson } from '@polkadot/types/types';
+export interface Contract {
+  document: ContractDocument,
+  api: ContractPromise
+}
 
-// interface CodeBase {
-//   id: string;
-//   codeHash: string;
-//   name: string;
-//   genesisHash: string;
-//   tags: string[];
-// }
-
-// export interface Code extends CodeBase {
-//   abi?: AnyJson | null;
-// }
-
-// export interface Code extends CodeBase {
-//   abi: InkAbi | null;
-// }
-
-// export interface CodeStored {
-//   id: string;
-//   contractAbi?: InkAbi;
-// }
-
-export interface WithCodes {
+export interface UseCodes {
   allCodes: Code[];
   hasCodes: boolean;
   isLoading: boolean;
+  refreshCodes: VoidFn;
+  updated: number;
+}
+
+export interface UseContracts {
+  allContracts: Contract[];
+  fetchContract: (_: string) => Promise<Contract | null>;
+  hasContracts: boolean;
+  isContract: (_: string) => Promise<boolean>;
+  isLoading: boolean;
+  refreshContracts: VoidFn;
   updated: number;
 }

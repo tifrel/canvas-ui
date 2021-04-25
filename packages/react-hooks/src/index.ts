@@ -12,7 +12,6 @@ export { default as useBlockTime } from './useBlockTime';
 export { default as useCall } from './useCall';
 export { default as useContract } from './useContract';
 export { default as useContracts } from './useContracts';
-export { default as useDatabase } from './useDatabase';
 export { default as useEndpoints } from './useEndpoints';
 export { default as useFormField } from './useFormField';
 export { default as useFile } from './useFile';

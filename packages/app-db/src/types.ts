@@ -25,6 +25,7 @@ export interface Code {
   codeHash: string;
   genesisHash: string;
   abi?: AnyJson | null
+  id: string;
   name: string;
   owner?: string;
   tags?: string[];

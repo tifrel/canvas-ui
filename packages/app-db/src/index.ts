@@ -4,7 +4,7 @@
 import Database from './Database';
 
 export { default as DbContext } from './DbContext';
-
+export { getPrivateKey } from './Database';
+export { default as useDatabase } from './useDatabase';
 export * from './types';
-
 export default Database;

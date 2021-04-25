@@ -4,15 +4,11 @@
 import type { Code } from '@canvas-ui/app-db/types';
 import type { UseCodes } from './types';
 
-import { useApi, useDatabase } from '@canvas-ui/react-hooks';
-import { Client, PrivateKey, ThreadID, Update } from '@textile/hub';
+import { useDatabase } from '@canvas-ui/app-db';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import store from './store';
-
-export default function useCodes (): WithCodes {
-  const { blockOneHash, isDevelopment } = useApi();
-  const { Code } = useDatabase();
+export default function useCodes (): UseCodes {
+  const { findCodes, isDbReady } = useDatabase();
   const [isLoading, setIsLoading] = useState(true);
   const [updated, setUpdated] = useState(0);
   const [allCodes, setAllCodes] = useState<Code[]>([]);
@@ -24,20 +20,35 @@ export default function useCodes (): WithCodes {
 
   const fetchCodes = useCallback(
     async (): Promise<void> => {
+      if (!isDbReady) return;
+
       setUpdated(Date.now());
 
-      const allCodes = await Code.find(isDevelopment ? { blockOneHash } : {}).toArray();
+      const allCodes = await findCodes();
+
+      console.log(allCodes);
 
       setAllCodes(allCodes);
+      setIsLoading(false);
     },
-    [Code, blockOneHash, isDevelopment]
+    [findCodes, isDbReady]
+  );
+
+  const refreshCodes = useCallback(
+    async (): Promise<void> => {
+      setIsLoading(true);
+
+      await fetchCodes();
+    },
+    [fetchCodes]
   );
 
   useEffect(
     (): void => {
       fetchCodes().then().catch((e) => console.error(e));
     },
-    [fetchCodes]
+    // eslint-disable-next-line
+    []
   );
 
   // useEffect(
@@ -58,6 +69,6 @@ export default function useCodes (): WithCodes {
   // );
 
   return {
-    allCodes, hasCodes, isLoading, updated
+    allCodes, hasCodes, isLoading, refreshCodes, updated
   };
 }

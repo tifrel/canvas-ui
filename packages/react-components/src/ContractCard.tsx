@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useAppNavigation } from '@canvas-ui/react-hooks';
+import { Contract } from '@canvas-ui/react-store/types';
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
-
-import { ContractPromise as Contract } from '@polkadot/api-contract';
 
 import { ELEV_2_CSS } from './styles/constants';
 import Abi from './Abi';
@@ -19,7 +18,7 @@ interface Props extends ComponentProps {
   contract: Contract;
 }
 
-function ContractCard ({ className, contract: { abi, address } }: Props): React.ReactElement<Props> {
+function ContractCard ({ className, contract, contract: { api: { abi }, document: { address } } }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { navigateTo } = useAppNavigation();
 
@@ -33,14 +32,14 @@ function ContractCard ({ className, contract: { abi, address } }: Props): React.
   return (
     <article className={className}>
       <ContractInfo
-        address={address.toString()}
+        contract={contract}
         isEditable
       >
         <Abi abi={abi} />
       </ContractInfo>
       <div className='footer'>
         <Button.Group>
-          <ContractForget address={address.toString()} />
+          <ContractForget contract={contract} />
           <Button
             isPrimary
             label={t<string>('Execute')}

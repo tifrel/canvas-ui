@@ -1,17 +1,16 @@
 // Copyright 2017-2021 @canvas-ui/app-execute authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { ComponentProps as Props } from '@canvas-ui/react-components/types';
+
 import { Button, ContractCard } from '@canvas-ui/react-components';
-import { useApi, useAppNavigation } from '@canvas-ui/react-hooks';
-import { getContractForAddress } from '@canvas-ui/react-util';
-import React, { useMemo } from 'react';
+import { useAppNavigation } from '@canvas-ui/react-hooks';
+import useContracts from '@canvas-ui/react-store/useContracts';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { ContractPromise as Contract } from '@polkadot/api-contract';
-
 import { useTranslation } from './translate';
-import { ComponentProps as Props } from './types';
 
 // function filterContracts (api: ApiPromise, keyringContracts: string[] = []): ContractPromise[] {
 //   return keyringContracts
@@ -19,18 +18,19 @@ import { ComponentProps as Props } from './types';
 //     .filter((contract): contract is Contract => !!contract);
 // }
 
-function Contracts ({ accounts, basePath, className, contracts: contractAddresses, hasContracts }: Props): React.ReactElement<Props> {
+function Contracts ({ basePath, className }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
-  const { api } = useApi();
   const { navigateTo, pathTo } = useAppNavigation();
-  const contracts = useMemo(
-    (): Contract[] | null => {
-      return accounts && contractAddresses && contractAddresses
-        .map((address): Contract | null => getContractForAddress(api, address))
-        .filter((contract: Contract | null): boolean => !!contract) as Contract[];
-    },
-    [accounts, api, contractAddresses]
-  );
+
+  const { allContracts, hasContracts } = useContracts();
+  // const contracts = useMemo(
+  //   (): Contract[] | null => {
+  //     return accounts && contractAddresses && contractAddresses
+  //       .map((address): Contract | null => getContractForAddress(api, address))
+  //       .filter((contract: Contract | null): boolean => !!contract) as Contract[];
+  //   },
+  //   [accounts, api, contractAddresses]
+  // );
 
   return (
     <div className={className}>
@@ -61,7 +61,7 @@ function Contracts ({ accounts, basePath, className, contracts: contractAddresse
           {hasContracts && (
             <h3>{t<string>('Instantiated Contracts')}</h3>
           )}
-          {contracts?.map((contract): React.ReactNode => ((
+          {allContracts?.map((contract): React.ReactNode => ((
             <ContractCard
               basePath={basePath}
               contract={contract}

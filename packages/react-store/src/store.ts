@@ -1,5 +1,4 @@
-// Copyright 2017-2021 @polkadot/react-store authors & contributors
-// and @canvas-ui/react-store authors & contributors
+// Copyright 2017-2021 @canvas-ui/react-store authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 // Moved from @canvas-ui/apps -> @canvas-ui/react-store
