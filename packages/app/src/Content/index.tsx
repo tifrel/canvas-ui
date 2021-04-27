@@ -2,11 +2,12 @@
 // and @canvas-ui/app authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { useDatabase } from '@canvas-ui/app-db';
 import createRoutes from '@canvas-ui/app-routing';
 import { Route } from '@canvas-ui/app-routing/types';
 import { ErrorBoundary, GuideModal, Icon, StatusContext, WithLoader } from '@canvas-ui/react-components';
 import { ELEV_3_CSS } from '@canvas-ui/react-components/styles/constants';
-import { useApi, useDatabase } from '@canvas-ui/react-hooks';
+import { useApi } from '@canvas-ui/react-hooks';
 import { classes } from '@canvas-ui/react-util';
 import React, { Suspense, useCallback, useContext, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';

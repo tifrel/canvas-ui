@@ -1,18 +1,18 @@
 // Copyright 2017-2021 @canvas-ui/app-upload authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { identityNodes } from '@canvas-ui/app-config/ui/identityIcons';
+import type { SubmittableResult } from '@polkadot/api';
+
+import { useDatabase } from '@canvas-ui/app-db';
 import { registry } from '@canvas-ui/react-api';
 import { Button, Input, InputABI, InputAddress, InputFile, TxButton } from '@canvas-ui/react-components';
-import { useAbi, useAccountId, useApi, useAppNavigation, useDatabase, useFile, useNonEmptyString } from '@canvas-ui/react-hooks';
+import { useAbi, useAccountId, useApi, useAppNavigation, useFile, useNonEmptyString } from '@canvas-ui/react-hooks';
 import { FileState } from '@canvas-ui/react-hooks/types';
 import PendingTx from '@canvas-ui/react-signer/PendingTx';
 import usePendingTx from '@canvas-ui/react-signer/usePendingTx';
-import store from '@canvas-ui/react-store/store';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { SubmittableResult } from '@polkadot/api';
 import { compactAddLength, isNull, isWasm } from '@polkadot/util';
 
 import { useTranslation } from './translate';
@@ -20,8 +20,8 @@ import { useTranslation } from './translate';
 function Upload (): React.ReactElement {
   const { t } = useTranslation();
   const { navigateTo, pathTo } = useAppNavigation();
-  const { api, blockOneHash } = useApi();
-  const { createCode, identity } = useDatabase();
+  const { api } = useApi();
+  const { createCode } = useDatabase();
   const [accountId, setAccountId] = useAccountId();
   const [name, setName, isNameValid, isNameError] = useNonEmptyString();
   const currentName = useRef(name);
@@ -89,17 +89,14 @@ function Upload (): React.ReactElement {
           return;
         }
 
-        createCode(
-          {
-            abi: abi?.json,
-            codeHash: codeHash.toHex(),
-            name,
-            tags: []
-          },
-          (id: string) => {
-            return () => navigateTo.uploadSuccess(id)();
-          }
-        );
+        createCode({
+          abi: abi?.json,
+          codeHash: codeHash.toHex(),
+          name,
+          tags: []
+        })
+          .then((id) => navigateTo.uploadSuccess(id)())
+          .catch((e) => console.error(e));
       }
     },
     [api, abi, createCode, name, navigateTo]

@@ -1,11 +1,11 @@
 // Copyright 2017-2021 @canvas-ui/app-execute authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ComponentProps as Props } from '@canvas-ui/react-components/types';
+import type { BareProps as Props } from '@canvas-ui/react-components/types';
 
-import { Button, ContractCard } from '@canvas-ui/react-components';
+import { useContracts } from '@canvas-ui/app-db';
+import { Button, ContractCard, WithLoader } from '@canvas-ui/react-components';
 import { useAppNavigation } from '@canvas-ui/react-hooks';
-import useContracts from '@canvas-ui/react-store/useContracts';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
@@ -18,11 +18,11 @@ import { useTranslation } from './translate';
 //     .filter((contract): contract is Contract => !!contract);
 // }
 
-function Contracts ({ basePath, className }: Props): React.ReactElement<Props> {
+function Contracts ({ className }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { navigateTo, pathTo } = useAppNavigation();
 
-  const { allContracts, hasContracts } = useContracts();
+  const { allContracts, hasContracts, isLoading } = useContracts();
   // const contracts = useMemo(
   //   (): Contract[] | null => {
   //     return accounts && contractAddresses && contractAddresses
@@ -34,48 +34,49 @@ function Contracts ({ basePath, className }: Props): React.ReactElement<Props> {
 
   return (
     <div className={className}>
-      <header>
-        <h1>{t(hasContracts ? 'Execute Contract' : 'No contracts available')}</h1>
-        <div className='instructions'>
-          {hasContracts
-            ? t<string>('Call messages on instantiated contracts.')
-            : (
-              <>
-                {t<string>('You can add an existing contract by')}
-                {' '}
-                <Link to={pathTo.executeAdd}>
-                  {t<string>('entering its address')}
-                </Link>
-                {`. ${t<string>('Or instantiate from a')} `}
-                <Link to={pathTo.instantiate}>
-                  {t<string>('code bundle')}
-                </Link>
-                {'.'}
-              </>
-            )
-          }
-        </div>
-      </header>
-      <section>
-        <div className='content'>
-          {hasContracts && (
-            <h3>{t<string>('Instantiated Contracts')}</h3>
-          )}
-          {allContracts?.map((contract): React.ReactNode => ((
-            <ContractCard
-              basePath={basePath}
-              contract={contract}
-              key={contract.address.toString()}
-            />
-          )))}
-          <Button.Group>
-            <Button
-              label={t<string>('Add An Existing Contract')}
-              onClick={navigateTo.executeAdd}
-            />
-          </Button.Group>
-        </div>
-      </section>
+      <WithLoader isLoading={isLoading}>
+        <header>
+          <h1>{t(hasContracts ? 'Execute Contract' : 'No contracts available')}</h1>
+          <div className='instructions'>
+            {hasContracts
+              ? t<string>('Call messages on instantiated contracts.')
+              : (
+                <>
+                  {t<string>('You can add an existing contract by')}
+                  {' '}
+                  <Link to={pathTo.executeAdd}>
+                    {t<string>('entering its address')}
+                  </Link>
+                  {`. ${t<string>('Or instantiate from a')} `}
+                  <Link to={pathTo.instantiate}>
+                    {t<string>('code bundle')}
+                  </Link>
+                  {'.'}
+                </>
+              )
+            }
+          </div>
+        </header>
+        <section>
+          <div className='content'>
+            {hasContracts && (
+              <h3>{t<string>('Instantiated Contracts')}</h3>
+            )}
+            {allContracts?.map((contract): React.ReactNode => ((
+              <ContractCard
+                contract={contract}
+                key={contract.document.address}
+              />
+            )))}
+            <Button.Group>
+              <Button
+                label={t<string>('Add An Existing Contract')}
+                onClick={navigateTo.executeAdd}
+              />
+            </Button.Group>
+          </div>
+        </section>
+      </WithLoader>
     </div>
   );
 }

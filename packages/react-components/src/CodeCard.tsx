@@ -1,10 +1,10 @@
 // Copyright 2017-2021 @canvas-ui/react-components authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Code } from '@canvas-ui/app-db/types';
+import type { CodeDocument as Code } from '@canvas-ui/app-db/types';
 import type { FileState } from '@canvas-ui/react-hooks/types';
 import type { VoidFn } from '@canvas-ui/react-util/types';
-import type { ComponentProps } from './types';
+import type { BareProps } from './types';
 
 import { useDatabase } from '@canvas-ui/app-db';
 import { useAbi, useAppNavigation, useToggle } from '@canvas-ui/react-hooks';
@@ -20,7 +20,7 @@ import CodeInfo from './CodeInfo';
 import CodeUploadABI from './CodeUploadABI';
 import { useTranslation } from './translate';
 
-interface Props extends ComponentProps {
+interface Props extends BareProps {
   code: Code;
   onForget?: VoidFn;
 }

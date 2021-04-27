@@ -1,37 +1,42 @@
 // Copyright 2017-2021 @canvas-ui/app-db authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { KeyInfo } from '@textile/hub';
-import type { DbProps } from './types';
+import type { DbProps, UserDocument } from './types';
 
 import { PrivateKey } from '@textile/crypto';
-import { Database as DB } from '@textile/threaddb';
+import { KeyInfo } from '@textile/hub';
+import { Collection, Database as DB } from '@textile/threaddb';
 import { ThreadID } from '@textile/threads-id';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import DbContext from './DbContext';
 import { code, contract, user } from './schemas';
+import { getPrivateKey, publicKeyHex } from './util';
 
 interface Props {
   children: React.ReactNode;
   rpcUrl: string;
 }
 
-const USER_IDENTITY_KEY = 'user-identity';
+async function createUser (db: DB): Promise<string> {
+  const User = db.collection('User') as Collection<UserDocument>;
+  const identity = getPrivateKey();
 
-export function getPrivateKey (): PrivateKey {
-  let idStr = window.localStorage.getItem(USER_IDENTITY_KEY);
+  const result = await User.findOne({ publicKey: publicKeyHex(identity) });
 
-  if (idStr) {
-    return PrivateKey.fromString(idStr);
-  } else {
-    const id = PrivateKey.fromRandom();
-
-    idStr = id.toString();
-    window.localStorage.setItem(USER_IDENTITY_KEY, idStr);
-
-    return id;
+  if (result) {
+    return Promise.resolve(result._id);
   }
+
+  if (identity && !result) {
+    return User.create({
+      codeBundles: [],
+      contracts: [],
+      publicKey: publicKeyHex(identity) as string
+    }).save();
+  }
+
+  return Promise.reject(new Error('Invalid identity'));
 }
 
 function isLocalNode (rpcUrl: string): boolean {
@@ -44,7 +49,10 @@ async function initDb (rpcUrl: string, isRemote = false): Promise<[DB, PrivateKe
     { name: 'User', schema: user },
     { name: 'Contract', schema: contract },
     { name: 'Code', schema: code }
-  ).open(1);
+  ).open(2);
+
+  await createUser(db);
+
   const identity = getPrivateKey();
 
   if (isRemote && !isLocalNode(rpcUrl)) {

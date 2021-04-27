@@ -1,17 +1,17 @@
 // Copyright 2017-2021 @canvas-ui/react-store authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Code } from '@canvas-ui/app-db/types';
-import type { UseCodes } from './types';
+import type { CodeDocument, UseCodes } from './types';
 
-import { useDatabase } from '@canvas-ui/app-db';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+
+import useDatabase from './useDatabase';
 
 export default function useCodes (): UseCodes {
   const { findCodes, isDbReady } = useDatabase();
   const [isLoading, setIsLoading] = useState(true);
   const [updated, setUpdated] = useState(0);
-  const [allCodes, setAllCodes] = useState<Code[]>([]);
+  const [allCodes, setAllCodes] = useState<CodeDocument[]>([]);
 
   const hasCodes = useMemo(
     (): boolean => allCodes.length > 0,

@@ -5,7 +5,7 @@ import type { BareProps as Props } from '@canvas-ui/react-components/types';
 
 import { Button, Input, InputABI, InputName } from '@canvas-ui/react-components';
 import { useAbi, useApi, useAppNavigation, useCall, useFile, useNonEmptyString, useNotification } from '@canvas-ui/react-hooks';
-import useContracts from '@canvas-ui/react-store/useContracts';
+import { useContracts } from '@canvas-ui/app-db';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 

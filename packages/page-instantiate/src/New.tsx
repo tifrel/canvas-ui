@@ -1,13 +1,13 @@
 // Copyright 2017-2021 @canvas-ui/app-instantiate authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Code } from '@canvas-ui/app-db/types';
+import type { CodeDocument as Code } from '@canvas-ui/app-db/types';
 import type { BareProps as Props } from '@canvas-ui/react-components/types';
 import type { SubmittableResult } from '@polkadot/api';
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
 import type { AccountId } from '@polkadot/types/interfaces';
 
-import useDatabase from '@canvas-ui/app-db/useDatabase';
+import { useDatabase } from '@canvas-ui/app-db';
 import { Button, Dropdown, Input, InputAddress, InputBalance, InputMegaGas, InputName, Labelled, MessageArg, MessageSignature, Toggle, TxButton } from '@canvas-ui/react-components';
 import useTxParams from '@canvas-ui/react-components/Params/useTxParams';
 import { extractValues } from '@canvas-ui/react-components/Params/values';
@@ -143,20 +143,17 @@ function New ({ className }: Props): React.ReactElement | null {
         // more clever here to find the exact contract deployed, this works for eg. Delegator)
         const address = records[records.length - 1].event.data[1] as unknown as AccountId;
 
-        name && createContract(
-          {
-            abi: abi?.json,
-            address: address.toString(),
-            name,
-            tags: []
-          },
-          (address: string) => {
-            return () => navigateTo.instantiateSuccess(address.toString())();
-          }
-        );
+        name && isNameValid && createContract({
+          abi: abi?.json,
+          address: address.toString(),
+          name,
+          tags: []
+        })
+          .then((address) => navigateTo.instantiateSuccess(address.toString())())
+          .catch((e) => console.error(e));
       }
     },
-    [abi, api, createContract, name, navigateTo]
+    [abi, api, createContract, isNameValid, name, navigateTo]
   );
 
   const additionalDetails = useMemo(

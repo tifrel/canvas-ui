@@ -1,29 +1,15 @@
 // Copyright 2017-2021 @canvas-ui/react-store authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Contract as ContractDocument } from '@canvas-ui/app-db/types';
-import type { ApiPromise } from '@polkadot/api';
 import type { Contract, UseContracts } from './types';
 
-import { useDatabase } from '@canvas-ui/app-db';
 import { useApi } from '@canvas-ui/react-hooks';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { ContractPromise } from '@polkadot/api-contract';
 import { keyring } from '@polkadot/ui-keyring';
 
-export function createContractFromDocument (api: ApiPromise, document: ContractDocument): Contract | null {
-  try {
-    const contract = new ContractPromise(api, document.abi, document.address);
-
-    return {
-      api: contract,
-      document
-    };
-  } catch (e) {
-    return null;
-  }
-}
+import useDatabase from './useDatabase';
+import { createContractFromDocument } from './util';
 
 export default function useContracts (): UseContracts {
   const { api } = useApi();
@@ -62,7 +48,7 @@ export default function useContracts (): UseContracts {
 
       const allContracts = (await findContracts())
         .map((document) => createContractFromDocument(api, document))
-        .filter((contract) => contract === null) as Contract[];
+        .filter((contract) => contract !== null) as Contract[];
 
       setAllContracts(allContracts);
       setIsLoading(false);
@@ -117,6 +103,8 @@ export default function useContracts (): UseContracts {
   //   },
   //   [_triggerUpdate]
   // );
+
+  console.log(allContracts);
 
   return {
     allContracts, fetchContract, hasContracts, isContract, isLoading, refreshContracts, updated

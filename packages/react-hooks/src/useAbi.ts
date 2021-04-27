@@ -2,12 +2,13 @@
 // and @canvas-ui/react-hooks authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Code } from '@canvas-ui/app-db/types';
+import type { CodeDocument as Code } from '@canvas-ui/app-db/types';
 import type { VoidFn } from '@canvas-ui/react-util/types';
 import type { AnyJson } from '@polkadot/types/types';
 
 import { useDatabase } from '@canvas-ui/app-db';
 import { useCallback, useEffect, useState } from 'react';
+
 import { Abi } from '@polkadot/api-contract';
 import { u8aToString } from '@polkadot/util';
 

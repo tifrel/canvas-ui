@@ -3,12 +3,10 @@
 
 import { AppProps as Props } from '@canvas-ui/react-components/types';
 import { useAppNavigation, useHasInstantiateWithCode } from '@canvas-ui/react-hooks';
-import useCodes from '@canvas-ui/react-store/useCodes';
 import React, { useEffect, useMemo } from 'react';
 import { Route, Switch } from 'react-router';
 
 import Success from './Success';
-import { ComponentProps } from './types';
 import Upload from './Upload';
 
 function UploadApp ({ basePath }: Props): React.ReactElement<Props> {

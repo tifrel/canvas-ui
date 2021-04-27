@@ -1,7 +1,7 @@
 // Copyright 2017-2021 @canvas-ui/react-components authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Contract } from '@canvas-ui/react-store/types';
+import type { Contract } from '@canvas-ui/app-db/types';
 import type { BareProps } from './types';
 
 import { useDatabase } from '@canvas-ui/app-db';

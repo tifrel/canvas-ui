@@ -1,13 +1,9 @@
 // Copyright 2017-2021 @canvas-ui/app-execute authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ComponentProps } from '@canvas-ui/react-components/types';
-
-import { WithLoader } from '@canvas-ui/react-components';
 import { AppProps as Props } from '@canvas-ui/react-components/types';
-import useContracts from '@canvas-ui/react-store/useContracts';
 import { classes } from '@canvas-ui/react-util';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Route, Switch } from 'react-router';
 
 import Add from './Add';
@@ -16,38 +12,35 @@ import Contracts from './Contracts';
 
 function ExecuteApp ({ basePath, className }: Props): React.ReactElement<Props> {
   // const { allAccounts, isReady: isAccountsReady } = useAccounts();
-  const { isLoading } = useContracts();
 
-  const componentProps = useMemo(
-    (): ComponentProps => ({
-      // accounts: allAccounts,
-      basePath
-      // contracts: allContracts,
-      // hasContracts,
-      // isContract
-    }),
-    [basePath]
-  );
+  // const componentProps = useMemo(
+  //   (): ComponentProps => ({
+  //     // accounts: allAccounts,
+  //     basePath
+  //     // contracts: allContracts,
+  //     // hasContracts,
+  //     // isContract
+  //   }),
+  //   [basePath]
+  // );
   // const isLoading = useMemo(
   //   (): boolean => !isContractsReady || !isAccountsReady,
   //   [isAccountsReady, isContractsReady]
   // );
 
   return (
-    <main className={classes(className, 'execute--App', isLoading && 'isLoading')}>
-      <WithLoader isLoading={isLoading}>
-        <Switch>
-          <Route path={`${basePath}/add`}>
-            <Add />
-          </Route>
-          <Route path={`${basePath}/:address/:messageIndex?`}>
-            <Call />
-          </Route>
-          <Route exact>
-            <Contracts {...componentProps} />
-          </Route>
-        </Switch>
-      </WithLoader>
+    <main className={classes(className, 'execute--App')}>
+      <Switch>
+        <Route path={`${basePath}/add`}>
+          <Add />
+        </Route>
+        <Route path={`${basePath}/:address/:messageIndex?`}>
+          <Call />
+        </Route>
+        <Route exact>
+          <Contracts />
+        </Route>
+      </Switch>
     </main>
   );
 }

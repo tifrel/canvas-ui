@@ -6,10 +6,11 @@ import type { SubmittableResult } from '@polkadot/api';
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
 import type { AccountId } from '@polkadot/types/interfaces';
 
+import { useDatabase } from '@canvas-ui/app-db';
 import { Button, Dropdown, Input, InputABI, InputAddress, InputBalance, InputMegaGas, InputName, MessageArg, MessageSignature, Toggle, TxButton } from '@canvas-ui/react-components';
 import { extractValues } from '@canvas-ui/react-components/Params/values';
 import { ELEV_2_CSS } from '@canvas-ui/react-components/styles/constants';
-import { useAbi, useAccountId, useApi, useAppNavigation, useDatabase, useFile, useGasWeight, useNonEmptyString, useNonZeroBn, useStepper } from '@canvas-ui/react-hooks';
+import { useAbi, useAccountId, useApi, useAppNavigation, useFile, useGasWeight, useNonEmptyString, useNonZeroBn, useStepper } from '@canvas-ui/react-hooks';
 import { ContractParams } from '@canvas-ui/react-params';
 import PendingTx from '@canvas-ui/react-signer/PendingTx';
 import usePendingTx from '@canvas-ui/react-signer/usePendingTx';
@@ -199,20 +200,17 @@ function NewFromCode ({ className }: Props): React.ReactElement<Props> | null {
         // more clever here to find the exact contract deployed, this works for eg. Delegator)
         const address = instantiatedRecords[instantiatedRecords.length - 1].event.data[1] as unknown as AccountId;
 
-        await createContract(
-          {
-            abi: abi?.json,
-            address: address.toString(),
-            name: contractName,
-            tags: []
-          },
-          (address: string) => {
-            return () => navigateTo.instantiateSuccess(address.toString())();
-          }
-        );
+        contractName && isContractNameValid && createContract({
+          abi: abi?.json,
+          address: address.toString(),
+          name: contractName,
+          tags: []
+        })
+          .then((address) => navigateTo.instantiateSuccess(address.toString())())
+          .catch((e) => console.error(e));
       }
     },
-    [abi, api, createCode, createContract, codeName, contractName, navigateTo]
+    [abi, api, createCode, createContract, codeName, contractName, isContractNameValid, navigateTo]
   );
 
   const additionalDetails = useMemo(

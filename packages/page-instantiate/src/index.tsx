@@ -1,10 +1,11 @@
 // Copyright 2017-2021 @canvas-ui/app-instantiate authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { useDatabase } from '@canvas-ui/app-db';
 import { WithLoader } from '@canvas-ui/react-components';
-import { AppProps as Props, ComponentProps } from '@canvas-ui/react-components/types';
-import { useDatabase, useHasInstantiateWithCode } from '@canvas-ui/react-hooks';
-import React, { useMemo } from 'react';
+import { AppProps as Props } from '@canvas-ui/react-components/types';
+import { useHasInstantiateWithCode } from '@canvas-ui/react-hooks';
+import React from 'react';
 import { Route, Switch } from 'react-router';
 
 import Add from './Add';
@@ -42,13 +43,6 @@ function InstantiateApp ({ basePath }: Props): React.ReactElement<Props> {
   //   [findCodes]
   // );
 
-  const componentProps = useMemo(
-    (): ComponentProps => ({
-      basePath
-    }),
-    [basePath]
-  );
-
   return (
     <main className='instantiate--App'>
       <WithLoader isLoading={!isDbReady}>
@@ -65,10 +59,10 @@ function InstantiateApp ({ basePath }: Props): React.ReactElement<Props> {
             <Add />
           </Route>
           <Route path={`${basePath}/success/:address`}>
-            <Success {...componentProps} />
+            <Success />
           </Route>
           <Route exact>
-            <Codes {...componentProps} />
+            <Codes />
           </Route>
         </Switch>
       </WithLoader>

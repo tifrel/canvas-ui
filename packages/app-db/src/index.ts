@@ -4,7 +4,11 @@
 import Database from './Database';
 
 export { default as DbContext } from './DbContext';
-export { getPrivateKey } from './Database';
 export { default as useDatabase } from './useDatabase';
+export { default as useCodes } from './useCodes';
+export { default as useContracts } from './useContracts';
+export { default as useCode } from './useCode';
+export { default as useContract } from './useContract';
 export * from './types';
+export * from './util';
 export default Database;

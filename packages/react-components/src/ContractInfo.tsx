@@ -1,10 +1,10 @@
 // Copyright 2017-2021 @canvas-ui/react-components authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Contract } from '@canvas-ui/react-store/types';
+import type { Contract } from '@canvas-ui/app-db/types';
 import type { BareProps } from './types';
 
-import useDatabase from '@canvas-ui/app-db/useDatabase';
+import { useDatabase } from '@canvas-ui/app-db';
 import { useNonEmptyString, useToggle } from '@canvas-ui/react-hooks';
 import { truncate } from '@canvas-ui/react-util';
 import React, { useCallback } from 'react';
@@ -29,10 +29,10 @@ function ContractInfo ({ children, className, contract: { document, document: { 
   const onSaveName = useCallback(
     (): void => {
       newName && isNewNameValid && updateContract(address, { name: newName })
-        .then()
+        .then((): void => toggleIsEditingName())
         .catch((e) => console.error(e));
     },
-    [address, isNewNameValid, newName, updateContract]
+    [address, isNewNameValid, newName, toggleIsEditingName, updateContract]
   );
   // const { isEditingName, name, onSaveName, setName, toggleIsEditingName } = useAccountInfo(address, true);
 
@@ -72,10 +72,10 @@ function ContractInfo ({ children, className, contract: { document, document: { 
             isEditable
               ? (
                 <EditButton onClick={toggleIsEditingName}>
-                  {name}
+                  {document.name}
                 </EditButton>
               )
-              : name
+              : document.name
           )
       }
     >
