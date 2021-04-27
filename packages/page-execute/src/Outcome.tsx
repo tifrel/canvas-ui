@@ -8,6 +8,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { TypeRegistry } from '@polkadot/types';
+import { ContractExecResultResult } from '@polkadot/types/interfaces';
 
 import { CallResult } from './types';
 
@@ -17,7 +18,11 @@ interface Props extends BareProps {
   registry: TypeRegistry;
 }
 
+const retrieveErrorMessage = (result: ContractExecResultResult) => `Error: ${result?.asErr?.asModule.message?.value?.toString()}`;
+
 function Outcome ({ className, onClear, outcome: { from, message, output, params, result, when }, registry }: Props): React.ReactElement<Props> | null {
+  const error = !result.isOk ? retrieveErrorMessage(result) : 'none';
+
   return (
     <div className={className}>
       <div className='info'>
@@ -40,6 +45,7 @@ function Outcome ({ className, onClear, outcome: { from, message, output, params
         />
       </div>
       <Output
+        error={error}
         isError={!result.isOk}
         registry={registry}
         type={message.returnType}

@@ -19,6 +19,7 @@ interface Props extends BareProps {
   children?: React.ReactNode;
   help?: React.ReactNode;
   isError?: boolean;
+  error?: string;
   isFull?: boolean;
   isHidden?: boolean;
   isMonospace?: boolean;
@@ -31,7 +32,7 @@ interface Props extends BareProps {
   withLabel?: boolean;
 }
 
-function Output ({ children, className = '', help, isError, isFull, isHidden, isTrimmed, label, registry, type, value, withCopy = false, withLabel }: Props): React.ReactElement<Props> {
+function Output ({ children, className = '', error = 'error', help, isError, isFull, isHidden, isTrimmed, label, registry, type, value, withCopy = false, withLabel }: Props): React.ReactElement<Props> {
   return (
     <Labelled
       className={className}
@@ -43,10 +44,11 @@ function Output ({ children, className = '', help, isError, isFull, isHidden, is
     >
       <div className={classes('ui--output', isError && 'error', 'monospace')}>
         <Data
+          isError= {isError}
           isTrimmed={isTrimmed}
           registry={registry}
           type={type}
-          value={value?.toJSON()}
+          value={isError ? error : value?.toJSON()}
         />
         {children}
         {withCopy
