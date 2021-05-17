@@ -12,9 +12,9 @@
   "dependencies": {
     "@babel/runtime": "^7.10.2",
     "@canvas-ui/app-config": "workspace:packages/app-config",
+    "@canvas-ui/app-db": "workspace:packages/app-db",
     "@canvas-ui/react-api": "workspace:packages/react-api",
     "@canvas-ui/react-hooks": "workspace:packages/react-hooks",
-    "@canvas-ui/react-store": "workspace:packages/react-store",
     "@canvas-ui/react-util": "workspace:packages/react-util",
     "@fortawesome/fontawesome-common-types": "^0.2.34",
     "@fortawesome/fontawesome-svg-core": "^1.2.32",

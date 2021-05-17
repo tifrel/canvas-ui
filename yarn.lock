@@ -1422,11 +1422,11 @@ __metadata:
   resolution: "@canvas-ui/app-instantiate@workspace:packages/page-instantiate"
   dependencies:
     "@babel/runtime": ^7.10.2
+    "@canvas-ui/app-db": "workspace:packages/app-db"
     "@canvas-ui/react-components": "workspace:packages/react-components"
     "@canvas-ui/react-hooks": "workspace:packages/react-hooks"
     "@canvas-ui/react-params": "workspace:packages/react-params"
     "@canvas-ui/react-signer": "workspace:packages/react-signer"
-    "@canvas-ui/react-store": "workspace:packages/react-store"
     "@canvas-ui/react-util": "workspace:packages/react-util"
     "@polkadot/api": ^4.6.2
     "@polkadot/api-contract": ^4.6.2
@@ -1475,11 +1475,11 @@ __metadata:
   resolution: "@canvas-ui/app-upload@workspace:packages/page-upload"
   dependencies:
     "@babel/runtime": ^7.10.2
+    "@canvas-ui/app-db": "workspace:packages/app-db"
     "@canvas-ui/react-api": "workspace:packages/react-api"
     "@canvas-ui/react-components": "workspace:packages/react-components"
     "@canvas-ui/react-hooks": "workspace:packages/react-hooks"
     "@canvas-ui/react-signer": "workspace:packages/react-signer"
-    "@canvas-ui/react-store": "workspace:packages/react-store"
     "@polkadot/api": ^4.6.2
     "@polkadot/util": ^6.2.1
     react: ^16.13.1
@@ -1575,9 +1575,9 @@ __metadata:
   dependencies:
     "@babel/runtime": ^7.10.2
     "@canvas-ui/app-config": "workspace:packages/app-config"
+    "@canvas-ui/app-db": "workspace:packages/app-db"
     "@canvas-ui/react-api": "workspace:packages/react-api"
     "@canvas-ui/react-hooks": "workspace:packages/react-hooks"
-    "@canvas-ui/react-store": "workspace:packages/react-store"
     "@canvas-ui/react-util": "workspace:packages/react-util"
     "@fortawesome/fontawesome-common-types": ^0.2.34
     "@fortawesome/fontawesome-svg-core": ^1.2.32
@@ -1621,8 +1621,8 @@ __metadata:
     "@babel/runtime": ^7.10.2
     "@canvas-ui/app": "workspace:packages/app"
     "@canvas-ui/app-config": "workspace:packages/app-config"
+    "@canvas-ui/app-db": "workspace:packages/app-db"
     "@canvas-ui/react-api": "workspace:packages/react-api"
-    "@canvas-ui/react-store": "workspace:packages/react-store"
     "@canvas-ui/react-util": "workspace:packages/react-util"
     "@polkadot/api-contract": ^4.6.2
     "@polkadot/api-derive": 4.6.2
@@ -1691,20 +1691,6 @@ __metadata:
     bn.js: ^4.11.9
     react: ^16.13.1
     styled-components: ^5.2.0
-  languageName: unknown
-  linkType: soft
-
-"@canvas-ui/react-store@workspace:packages/react-store":
-  version: 0.0.0-use.local
-  resolution: "@canvas-ui/react-store@workspace:packages/react-store"
-  dependencies:
-    "@babel/runtime": ^7.10.2
-    "@canvas-ui/react-api": "workspace:packages/react-api"
-    "@polkadot/types": ^4.6.2
-    eventemitter3: ^4.0.7
-    nanoid: ^3.1.10
-    react: ^16.13.1
-    store: ^2.0.12
   languageName: unknown
   linkType: soft
 
@@ -15200,7 +15186,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"nanoid@npm:^3.1.10, nanoid@npm:^3.1.20, nanoid@npm:^3.1.3":
+"nanoid@npm:^3.1.20, nanoid@npm:^3.1.3":
   version: 3.1.20
   resolution: "nanoid@npm:3.1.20"
   bin:

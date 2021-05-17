@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Contract } from '@canvas-ui/app-db/types';
+import type { VoidFn } from '@canvas-ui/react-util/types';
 import type { BareProps } from './types';
 
 import { useDatabase } from '@canvas-ui/app-db';
@@ -16,9 +17,10 @@ import { useTranslation } from './translate';
 
 interface Props extends BareProps {
   contract: Contract;
+  onForget?: VoidFn;
 }
 
-function ContractForget ({ className, contract, contract: { document: { address } } }: Props): React.ReactElement<Props> {
+function ContractForget ({ className, contract, contract: { document: { address } }, onForget }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { removeContract } = useDatabase();
   const showNotification = useNotification();
@@ -33,8 +35,9 @@ function ContractForget ({ className, contract, contract: { document: { address 
         status: 'success'
       });
       toggleIsOpen();
+      onForget && onForget();
     },
-    [address, showNotification, t, toggleIsOpen]
+    [address, onForget, showNotification, t, toggleIsOpen]
   );
 
   const _onForget = useCallback(

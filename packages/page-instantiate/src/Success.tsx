@@ -35,9 +35,12 @@ function Success (): React.ReactElement | null {
         </div>
       </header>
       <section>
-        {contract && <ContractCard
-          contract={contract}
-        />}
+        {contract &&
+          <ContractCard
+            contract={contract}
+            onForget={navigateTo.instantiate}
+          />
+        }
         <Button.Group>
           <Button
             isPrimary

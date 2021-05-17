@@ -10,6 +10,7 @@ import { EraRewardPoints } from '@polkadot/types/interfaces';
 import { formatNumber } from '@polkadot/util';
 
 import ResetStorageModal from './ResetStorageModal';
+import useDatabase from '@canvas-ui/app-db/useDatabase';
 
 interface Authors {
   byAuthor: Record<string, string>;
@@ -33,6 +34,7 @@ const ValidatorsContext: React.Context<string[]> = React.createContext<string[]>
 
 function BlockAuthorsBase ({ children }: Props): React.ReactElement<Props> {
   const { api, isApiReady, systemChain } = useApi();
+  const { checkForExpiredDocuments } = useDatabase();
   const queryPoints = useCall<EraRewardPoints>(isApiReady && api.derive.staking?.currentPoints, []);
   const [state, setState] = useState<Authors>({ byAuthor, eraPoints, lastBlockAuthors: [], lastHeaders: [] });
   const [validators, setValidators] = useState<string[]>([]);
@@ -73,12 +75,13 @@ function BlockAuthorsBase ({ children }: Props): React.ReactElement<Props> {
           const chainName = (await api.rpc.system.chain()).toString();
 
           const blockOneHash = (await api.query.system.blockHash(1));
-          const blockOneHashRef = window.localStorage.getItem('blockOneHash');
+          // const blockOneHashRef = window.localStorage.getItem('blockOneHash');
+
+          const hasExpiredDocuments = await checkForExpiredDocuments(blockOneHash.toString());
 
           if (
             chainName === 'Development' &&
-            blockOneHashRef &&
-            blockOneHashRef !== blockOneHash.toString()
+            hasExpiredDocuments
           ) {
             setIsChainPurged(true);
           }

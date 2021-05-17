@@ -3,9 +3,9 @@
 
 import type { BareProps as Props } from '@canvas-ui/react-components/types';
 
+import { useContracts, useDatabase } from '@canvas-ui/app-db';
 import { Button, Input, InputABI, InputName } from '@canvas-ui/react-components';
 import { useAbi, useApi, useAppNavigation, useCall, useFile, useNonEmptyString, useNotification } from '@canvas-ui/react-hooks';
-import { useContracts } from '@canvas-ui/app-db';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
@@ -18,6 +18,7 @@ import { useTranslation } from './translate';
 function Add ({ className }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { api } = useApi();
+  const { createContract } = useDatabase();
   const { isContract } = useContracts();
   const { navigateTo } = useAppNavigation();
   const showNotification = useNotification();
@@ -66,7 +67,7 @@ function Add ({ className }: Props): React.ReactElement<Props> {
 
   const [isAddressValid, status] = useMemo(
     (): [boolean, React.ReactNode | null] => {
-      const isAddressValid = isAddress && isStored && isNotAdded === false;
+      const isAddressValid = isAddress && isStored && isNotAdded;
 
       let status = null;
 
@@ -120,7 +121,14 @@ function Add ({ className }: Props): React.ReactElement<Props> {
           status: address ? 'success' : 'error'
         });
 
-        navigateTo.execute();
+        createContract({
+          abi: abi.json,
+          address,
+          name,
+          tags: []
+        })
+          .then(navigateTo.execute)
+          .catch((e) => console.error(e));
       } catch (error) {
         console.error(error);
 
@@ -132,7 +140,7 @@ function Add ({ className }: Props): React.ReactElement<Props> {
         });
       }
     },
-    [abi, address, api, name, navigateTo, showNotification, t]
+    [abi, address, api, createContract, name, navigateTo, showNotification, t]
   );
 
   return (

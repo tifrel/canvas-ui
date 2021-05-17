@@ -9,15 +9,29 @@
             "description": "Field to contain ulid-based instance id",
             "type": "string"
         },
-        "codeBundles": {
-            "description": "Addresses of saved smart contracts",
+        "codeBundlesOwned": {
+            "description": "Addresses of user's uploaded code bundles",
             "type": "array",
             "items": {
                 "type": "string"
             }
         },
-        "contracts": {
-            "description": "Addresses of saved smart contracts",
+        "codeBundlesStarred": {
+            "description": "Addresses of user's starred code bundles",
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "contractsOwned": {
+            "description": "Addresses of user's instantiated smart contracts",
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "contractsStarred": {
+            "description": "Addresses of user's starred smart contracts",
             "type": "array",
             "items": {
                 "type": "string"

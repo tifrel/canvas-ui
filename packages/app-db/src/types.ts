@@ -19,8 +19,8 @@ interface Document {
 }
 
 export interface UserDocument extends Document {
-  codeBundles: string[];
-  contracts: string[];
+  codeBundlesStarred: string[];
+  contractsStarred: string[];
   publicKey: string,
   email?: string,
   name?: string

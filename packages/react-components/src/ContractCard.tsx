@@ -1,6 +1,9 @@
 // Copyright 2017-2021 @canvas-ui/react-components authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { VoidFn } from '@canvas-ui/react-util/types';
+import type { BareProps } from './types';
+
 import { Contract } from '@canvas-ui/app-db/types';
 import { useAppNavigation } from '@canvas-ui/react-hooks';
 import React, { useCallback } from 'react';
@@ -12,13 +15,13 @@ import Button from './Button';
 import ContractForget from './ContractForget';
 import ContractInfo from './ContractInfo';
 import { useTranslation } from './translate';
-import { BareProps } from './types';
 
 interface Props extends BareProps {
   contract: Contract;
+  onForget?: VoidFn;
 }
 
-function ContractCard ({ className, contract, contract: { api: { abi }, document: { address } } }: Props): React.ReactElement<Props> {
+function ContractCard ({ className, contract, contract: { api: { abi }, document: { address } }, onForget }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { navigateTo } = useAppNavigation();
 
@@ -39,7 +42,10 @@ function ContractCard ({ className, contract, contract: { api: { abi }, document
       </ContractInfo>
       <div className='footer'>
         <Button.Group>
-          <ContractForget contract={contract} />
+          <ContractForget
+            contract={contract}
+            onForget={onForget}
+          />
           <Button
             isPrimary
             label={t<string>('Execute')}

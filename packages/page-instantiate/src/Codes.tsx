@@ -16,7 +16,7 @@ function Codes ({ className }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { navigateTo, pathTo } = useAppNavigation();
   const hasInstantiateWithCode = useHasInstantiateWithCode();
-  const { allCodes, hasCodes, refreshCodes, isLoading } = useCodes();
+  const { allCodes, hasCodes, isLoading, refreshCodes } = useCodes();
 
   const uploadPath = hasInstantiateWithCode ? pathTo.instantiateNew() : pathTo.upload;
 

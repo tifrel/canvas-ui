@@ -43,15 +43,15 @@ ReactDOM.render(
     <ThemeProvider theme={theme}>
       <Queue>
         <Api url={settings.apiUrl}>
-          <BlockAuthors>
-            <Database rpcUrl={settings.apiUrl}>
+          <Database rpcUrl={settings.apiUrl}>
+            <BlockAuthors>
               <Events>
                 <HashRouter>
                   <Apps />
                 </HashRouter>
               </Events>
-            </Database>
-          </BlockAuthors>
+            </BlockAuthors>
+          </Database>
         </Api>
       </Queue>
     </ThemeProvider>

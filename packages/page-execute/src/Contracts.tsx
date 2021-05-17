@@ -22,7 +22,7 @@ function Contracts ({ className }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { navigateTo, pathTo } = useAppNavigation();
 
-  const { allContracts, hasContracts, isLoading } = useContracts();
+  const { allContracts, hasContracts, isLoading, refreshContracts } = useContracts();
   // const contracts = useMemo(
   //   (): Contract[] | null => {
   //     return accounts && contractAddresses && contractAddresses
@@ -66,6 +66,7 @@ function Contracts ({ className }: Props): React.ReactElement<Props> {
               <ContractCard
                 contract={contract}
                 key={contract.document.address}
+                onForget={refreshContracts}
               />
             )))}
             <Button.Group>

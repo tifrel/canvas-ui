@@ -7,8 +7,8 @@ import type { SubmittableResult } from '@polkadot/api';
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
 import type { AccountId } from '@polkadot/types/interfaces';
 
-import { useDatabase } from '@canvas-ui/app-db';
-import { Button, Dropdown, Input, InputAddress, InputBalance, InputMegaGas, InputName, Labelled, MessageArg, MessageSignature, Toggle, TxButton } from '@canvas-ui/react-components';
+import { useCode, useDatabase } from '@canvas-ui/app-db';
+import { Button, Dropdown, Input, InputAddress, InputBalance, InputMegaGas, InputName, Labelled, MessageArg, MessageSignature, Toggle, TxButton, WithLoader } from '@canvas-ui/react-components';
 import useTxParams from '@canvas-ui/react-components/Params/useTxParams';
 import { extractValues } from '@canvas-ui/react-components/Params/values';
 import { ELEV_2_CSS } from '@canvas-ui/react-components/styles/constants';
@@ -51,14 +51,14 @@ function New ({ className }: Props): React.ReactElement | null {
   // );
   const useWeightHook = useGasWeight();
   const { isValid: isWeightValid, weight } = useWeightHook;
-  const [code, setCode] = useState<Code | null>(null);
+  const [code, isInvalid] = useCode(id);
 
-  useEffect(
-    (): void => {
-      findCodeById(id).then((code) => setCode(code || null)).catch((e) => console.error(e));
-    },
-    [findCodeById, id]
-  );
+  // useEffect(
+  //   (): void => {
+  //     findCodeById(id).then((code) => setCode(code || null)).catch((e) => console.error(e));
+  //   },
+  //   [findCodeById, id]
+  // );
 
   const [accountId, setAccountId] = useAccountId();
   const [endowment, setEndowment, isEndowmentValid] = useNonZeroBn(ENDOWMENT);
@@ -178,11 +178,11 @@ function New ({ className }: Props): React.ReactElement | null {
 
   useEffect(
     (): void => {
-      if (!abi) {
+      if (isInvalid) {
         navigateTo.instantiate();
       }
     },
-    [abi, navigateTo]
+    [isInvalid, navigateTo]
   );
 
   return (
@@ -192,96 +192,98 @@ function New ({ className }: Props): React.ReactElement | null {
       registry={abi?.registry}
       {...pendingTx}
     >
-      <div className={className}>
-        <header>
-          <h1>{t<string>('Instantiate {{contractName}}', { replace: { contractName: code?.name || 'Contract' } })}</h1>
-          <div className='instructions'>
-            {t<string>('Choose an account to instantiate the contract from, give it a descriptive name and set the endowment amount.')}
-          </div>
-        </header>
-        <section>
-          <InputAddress
-            help={t<string>('Specify the user account to use for this instantiation. Any fees will be deducted from this account.')}
-            isInput={false}
-            label={t<string>('instantiation account')}
-            onChange={setAccountId}
-            type='account'
-            value={accountId}
-          />
-          <InputName
-            isContract
-            isError={isNameError}
-            onChange={setName}
-            value={name || ''}
-          />
-          <Labelled label={t<string>('Code Bundle')}>
-            <div className='code-bundle'>
-              <div className='name'>
-                {code?.name || ''}
-              </div>
-              <div className='code-hash'>
-                {truncate(code?.codeHash || '', 16)}
-              </div>
+      <WithLoader isLoading={!code && !isInvalid}>
+        <div className={className}>
+          <header>
+            <h1>{t<string>('Instantiate {{contractName}}', { replace: { contractName: code?.name || 'Contract' } })}</h1>
+            <div className='instructions'>
+              {t<string>('Choose an account to instantiate the contract from, give it a descriptive name and set the endowment amount.')}
             </div>
-          </Labelled>
-          {abi && (
-            <>
-              <Dropdown
-                help={t<string>('The instantiation constructor information for this contract, as provided by the ABI.')}
-                isDisabled={abi.constructors.length <= 1}
-                label={t<string>('Instantiation Constructor')}
-                onChange={setConstructorIndex}
-                options={constructOptions}
-                value={`${constructorIndex}`}
-              />
-              <ContractParams
-                onChange={setValues}
-                params={params || []}
-                values={values}
-              />
-            </>
-          )}
-          <InputBalance
-            help={t<string>('The allotted endowment for this contract, i.e. the amount transferred to the contract upon instantiation.')}
-            isError={!isEndowmentValid}
-            label={t<string>('Endowment')}
-            onChange={setEndowment}
-            value={endowment}
-          />
-          <Input
-            help={t<string>('A hex or string value that acts as a salt for this instantiation.')}
-            isDisabled={!withSalt}
-            label={t<string>('Unique Instantiation Salt')}
-            onChange={setSalt}
-            placeholder={t<string>('0x prefixed hex, e.g. 0x1234 or ascii data')}
-            value={withSalt ? salt : t<string>('<none>')}
-          >
-            <Toggle
-              className='toggle'
-              isOverlay
-              label={t<string>('use salt')}
-              onChange={setWithSalt}
-              value={withSalt}
+          </header>
+          <section>
+            <InputAddress
+              help={t<string>('Specify the user account to use for this instantiation. Any fees will be deducted from this account.')}
+              isInput={false}
+              label={t<string>('instantiation account')}
+              onChange={setAccountId}
+              type='account'
+              value={accountId}
             />
-          </Input>
-          <InputMegaGas
-            help={t<string>('The maximum amount of gas that can be used by this transaction, if the code requires more, the transaction will fail.')}
-            weight={useWeightHook}
-          />
-          <Button.Group>
-            <TxButton
-              accountId={accountId}
-              extrinsic={initTx}
-              icon='cloud-upload-alt'
-              isDisabled={!isValid}
-              isPrimary
-              label={t<string>('Instantiate')}
-              onSuccess={_onSuccess}
-              withSpinner
+            <InputName
+              isContract
+              isError={isNameError}
+              onChange={setName}
+              value={name || ''}
             />
-          </Button.Group>
-        </section>
-      </div>
+            <Labelled label={t<string>('Code Bundle')}>
+              <div className='code-bundle'>
+                <div className='name'>
+                  {code?.name || ''}
+                </div>
+                <div className='code-hash'>
+                  {truncate(code?.codeHash || '', 16)}
+                </div>
+              </div>
+            </Labelled>
+            {abi && (
+              <>
+                <Dropdown
+                  help={t<string>('The instantiation constructor information for this contract, as provided by the ABI.')}
+                  isDisabled={abi.constructors.length <= 1}
+                  label={t<string>('Instantiation Constructor')}
+                  onChange={setConstructorIndex}
+                  options={constructOptions}
+                  value={`${constructorIndex}`}
+                />
+                <ContractParams
+                  onChange={setValues}
+                  params={params || []}
+                  values={values}
+                />
+              </>
+            )}
+            <InputBalance
+              help={t<string>('The allotted endowment for this contract, i.e. the amount transferred to the contract upon instantiation.')}
+              isError={!isEndowmentValid}
+              label={t<string>('Endowment')}
+              onChange={setEndowment}
+              value={endowment}
+            />
+            <Input
+              help={t<string>('A hex or string value that acts as a salt for this instantiation.')}
+              isDisabled={!withSalt}
+              label={t<string>('Unique Instantiation Salt')}
+              onChange={setSalt}
+              placeholder={t<string>('0x prefixed hex, e.g. 0x1234 or ascii data')}
+              value={withSalt ? salt : t<string>('<none>')}
+            >
+              <Toggle
+                className='toggle'
+                isOverlay
+                label={t<string>('use salt')}
+                onChange={setWithSalt}
+                value={withSalt}
+              />
+            </Input>
+            <InputMegaGas
+              help={t<string>('The maximum amount of gas that can be used by this transaction, if the code requires more, the transaction will fail.')}
+              weight={useWeightHook}
+            />
+            <Button.Group>
+              <TxButton
+                accountId={accountId}
+                extrinsic={initTx}
+                icon='cloud-upload-alt'
+                isDisabled={!isValid}
+                isPrimary
+                label={t<string>('Instantiate')}
+                onSuccess={_onSuccess}
+                withSpinner
+              />
+            </Button.Group>
+          </section>
+        </div>
+      </WithLoader>
     </PendingTx>
   );
 }

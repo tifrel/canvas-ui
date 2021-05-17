@@ -2,6 +2,7 @@
 // and @canvas-ui/react-components authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { useDatabase } from '@canvas-ui/app-db';
 import { useToggle } from '@canvas-ui/react-hooks';
 import store from '@canvas-ui/react-store/store';
 import React, { useCallback } from 'react';
@@ -17,6 +18,7 @@ import { BareProps } from './types';
 function ResetStorageModal ({ className }: BareProps): React.ReactElement<BareProps> {
   const { t } = useTranslation();
   const [isOpen, toggleIsOpen] = useToggle(true);
+  const { dropExpiredDocuments } = useDatabase();
 
   const _onClose = useCallback(
     (): void => {
@@ -26,20 +28,20 @@ function ResetStorageModal ({ className }: BareProps): React.ReactElement<BarePr
   );
 
   const _onReset = useCallback(
-    (): void => {
+    async (): Promise<void> => {
       const existingContractList = keyring.getContracts();
 
       existingContractList.forEach((existingContract) => {
         keyring.forgetContract(existingContract.address.toString());
       });
 
-      store.forgetAll();
+      await dropExpiredDocuments();
 
       window.localStorage.removeItem('blockOneHash');
 
       _onClose();
     },
-    [_onClose]
+    [_onClose, dropExpiredDocuments]
   );
 
   return (

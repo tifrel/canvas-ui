@@ -1,4 +1,4 @@
-// Copyright 2017-2021 @canvas-ui/react-store authors & contributors
+// Copyright 2017-2021 @canvas-ui/app-db authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Contract, UseContracts } from './types';
@@ -45,6 +45,7 @@ export default function useContracts (): UseContracts {
       if (!isDbReady) return;
 
       setUpdated(Date.now());
+      console.log('fetchAllContracts');
 
       const allContracts = (await findContracts())
         .map((document) => createContractFromDocument(api, document))

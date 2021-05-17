@@ -25,6 +25,8 @@ interface UseDb extends DbProps {
   createCode: (newCode: CodeFields) => Promise<string>;
   createContract: (newContract: ContractFields) => Promise<string>;
   createUser: () => Promise<string>;
+  checkForExpiredDocuments: (_: string) => Promise<boolean>;
+  dropExpiredDocuments: () => Promise<void>;
   findCodes: () => Promise<CodeDocument[]>;
   findCodeByHash: (codeHash: string) => Promise<CodeDocument | null>;
   findCodeById: (id: string) => Promise<CodeDocument | null>;
@@ -82,8 +84,8 @@ export default function useDatabase (): UseDb {
 
       if (identity && !existing) {
         return User.create({
-          codeBundles: [],
-          contracts: [],
+          codeBundlesStarred: [],
+          contractsStarred: [],
           publicKey: u8aToHex(identity.pubKey)
         }).save();
       }
@@ -93,13 +95,33 @@ export default function useDatabase (): UseDb {
     [User, findUser]
   );
 
+  const checkForExpiredDocuments = useCallback(
+    async (blockOneHash: string): Promise<boolean> => {
+      const expiredCodes = await Code.find({ blockOneHash: { $ne: blockOneHash } }).toArray();
+      const expiredContracts = await Contract.find({ blockOneHash: { $ne: blockOneHash } }).toArray();
+
+      return expiredCodes.length > 0 || expiredContracts.length > 0;
+    },
+    [Code, Contract]
+  );
+
+  const dropExpiredDocuments = useCallback(
+    async (): Promise<void> => {
+      await Promise.all((await Code.find({}).toArray()).map((code) => code.remove()));
+      await Promise.all((await Contract.find({}).toArray()).map((contract) => contract.remove()));
+    },
+    [Code, Contract]
+  );
+
   const findCodes = useCallback(
     async (): Promise<CodeDocument[]> => {
-      const result = Code.find({ blockOneHash, owner: isDevelopment ? publicKeyHex(identity) : undefined });
+      const user = await findUser();
+      const owned = await Code.find({ owner: user.publicKey });
+      const starred = await Code.find({ id: { $in: user.codeBundlesStarred } }).toArray();
 
-      return result ? (await result.toArray()) : [];
+      return results;
     },
-    [blockOneHash, identity, isDevelopment, Code]
+    [findUser, Code]
   );
 
   const findCodeByHash = useCallback(
@@ -118,13 +140,12 @@ export default function useDatabase (): UseDb {
 
   const findContracts = useCallback(
     async (): Promise<ContractDocument[]> => {
-      const results = await Contract.find({ blockOneHash, owner: isDevelopment ? publicKeyHex(identity) : undefined }).toArray();
-
-      console.log(results);
+      const user = await findUser();
+      const results = await Contract.find({ address: { $in: user.contracts } }).toArray();
 
       return results;
     },
-    [blockOneHash, identity, isDevelopment, Contract]
+    [findUser, Contract]
   );
 
   const findContractByAddress = useCallback(
@@ -144,7 +165,9 @@ export default function useDatabase (): UseDb {
         const user = await User.findOne({ publicKey: publicKeyHex(identity) });
 
         if (user) {
-          user.codeBundles = [...new Set(user.codeBundles), id];
+          if (!user.codeBundles.includes(id)) {
+            user.codeBundles.push(id);
+          }
 
           return user.save();
         }
@@ -169,9 +192,6 @@ export default function useDatabase (): UseDb {
         if (user) {
           user.codeBundles = user.codeBundles.filter((anId) => id !== anId);
 
-          console.log('after');
-          console.log(user.codeBundles);
-
           return user.save();
         }
 
@@ -186,7 +206,7 @@ export default function useDatabase (): UseDb {
   );
 
   const addContractForUser = useCallback(
-    async (id: string): Promise<string> => {
+    async (address: string): Promise<string> => {
       try {
         if (!identity) {
           return Promise.reject(new Error('No user identity'));
@@ -195,7 +215,9 @@ export default function useDatabase (): UseDb {
         const user = await User.findOne({ publicKey: publicKeyHex(identity) });
 
         if (user) {
-          user.contracts = [...new Set(user.contracts), id];
+          if (!user.contracts.includes(address)) {
+            user.contracts.push(address);
+          }
 
           return user.save();
         }
@@ -209,7 +231,7 @@ export default function useDatabase (): UseDb {
   );
 
   const removeContractForUser = useCallback(
-    async (id: string): Promise<string> => {
+    async (address: string): Promise<string> => {
       try {
         if (!identity) {
           return Promise.reject(new Error('No user identity'));
@@ -218,7 +240,7 @@ export default function useDatabase (): UseDb {
         const user = await User.findOne({ publicKey: publicKeyHex(identity) });
 
         if (user) {
-          user.contracts = user.contracts.filter((anId) => id !== anId);
+          user.contracts = user.contracts.filter((anAddress) => address !== anAddress);
 
           return user.save();
         }
@@ -319,6 +341,10 @@ export default function useDatabase (): UseDb {
           return Promise.reject(new Error('Missing address or name'));
         }
 
+        if (await Contract.findOne({ address })) {
+          return Promise.reject(new Error('Contract already exists'));
+        }
+
         const newContract = Contract.create({
           abi,
           address,
@@ -382,7 +408,7 @@ export default function useDatabase (): UseDb {
         await removeContractForUser(address);
 
         if (isOwned) {
-          return Code.delete(address);
+          return Contract.delete(existing._id as string);
         }
 
         return Promise.resolve();
@@ -390,16 +416,18 @@ export default function useDatabase (): UseDb {
         return Promise.reject(new Error(e));
       }
     },
-    [Code, findContractByAddress, findUser, removeContractForUser]
+    [Contract, findContractByAddress, findUser, removeContractForUser]
   );
 
   return {
     addCodeForUser,
     addContractForUser,
+    checkForExpiredDocuments,
     createCode,
     createContract,
     createUser,
     db,
+    dropExpiredDocuments,
     findCodeByHash,
     findCodeById,
     findCodes,
